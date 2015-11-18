@@ -37,8 +37,8 @@ import io.jsonwebtoken.impl.Base64UrlCodec;
 public class RestService
 {
 	private static final Logger	LOGGER	= LoggerFactory.getLogger(RestService.class);
-
-	@GET
+	
+	/*@GET
 	@Produces("application/json")
 	public String index() throws URISyntaxException
 	{
@@ -46,26 +46,25 @@ public class RestService
 		LOGGER.error("GET Request without GUID received");
 		JSONObject outerJson = new JSONObject(ResponseFactory.createInvalidRequestResponse());
 		return outerJson.toString();
-	}
-
+	}*/
+	
 	@GET
 	@Produces("application/json")
-	@Path("{guid}")
+	@Path("guid/{guid}")
 	public String getData(@PathParam("guid") String guid)
 	{
 		LOGGER.info("GET Request received for GUID " + guid);
 		// TODO verify format of GlobalID
-
+		
 		JSONObject jsonResponse = new JSONObject(ResponseFactory.createDataNotFoundResponse());
 		
 		if(guid != null)
 		{
 			// retrieve data from TomP2P
-
 			try
 			{
 				String jwt = DHTManager.getInstance().get(guid);
-
+				
 				if(jwt != null)
 				{
 					// TODO finish check of "active" flag and add handling of migrating records (active=2)
@@ -86,10 +85,126 @@ public class RestService
 			{
 				LOGGER.error("Error while getting data from DHT: " + e.getMessage());
 			}
-
 		}
 		// respond with data from TomP2P
 		return jsonResponse.toString();
+	}
+	
+	/**
+	 * Writes a JWT to the DHT, if valid
+	 * 
+	 * @param dataset
+	 * @return
+	 */
+	@PUT
+	@Path("guid/{guid}")
+	//@Consumes("application/json") // there is no application/json+jwt content type yet
+	public String putData(String jwt, @PathParam("guid") String guid)
+	{
+		LOGGER.info("PUT Request received: " + jwt);
+		
+		JSONObject data; // the new version of the jwt
+		JSONObject existingData; // the already existing version (if there is any)
+		String guidFromDataset; // the guid of the jwt
+		
+		PublicKey publicKey; // the public key of the NEW version
+		
+		try
+		{
+// verification of passed JWT
+			// get payload from jwt
+			JSONObject jwtHeader = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[0])));
+			LOGGER.info("header: " + jwtHeader.toString());
+			
+			// step by step:
+			JSONObject jwtPayload = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[1])));
+			LOGGER.info("payload: " + jwtPayload.toString());
+			
+			data = new JSONObject(jwtPayload.get("data").toString());
+			
+			// extract public key for signature verification
+			publicKey = KeyPairManager.decodePublicKey(data.getString("publicKey"));
+			
+			// verify jwt
+			Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);
+			LOGGER.info("token verified");
+			
+			// verify GUID
+			if(!data.getString("guid").equals(GUID.createGUID(data.getString("publicKey"), data.getString("salt"))))
+				throw new IntegrityException("GUID is invalid!");
+			
+			// get the already existing jwt from the DHT
+			if(!guid.equals(data.getString("guid")))
+				throw new IntegrityException("GUID mismatch!");
+			
+			// TODO verify data of jwt claim
+			
+			// if no exception has been thrown until here, the jwt signature has been verified
+			
+// verification of JWT claim "data"
+			
+// check for an already existing jwt in the DHT
+			
+			String dhtResult = DHTManager.getInstance().get(guid);
+			
+			if(dhtResult != null)
+			{
+				
+// updating an existing dataset
+				
+				JSONObject jwtPayloadFromDHT = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(dhtResult.split("\\.")[1])));
+				
+				existingData = jwtPayloadFromDHT.getJSONObject("data");
+				
+				// TODO also check the validity of THIS jwt and payload!
+				
+				// verify that GUIDs are matching
+				if(!data.getString("guid").equals(existingData.getString("guid")))
+					throw new IntegrityException("GUIDs are not matching!");
+				
+				LOGGER.info("Dataset for [" + guid + "] updated: \n" + jwt);
+				
+				// here, everything is alright. so we write the jwt to the dht
+				DHTManager.getInstance().put(guid, jwt);
+				
+				JSONObject jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
+				return jsonResponse.toString();
+			}
+			else
+			{
+				
+// writing a new dataset
+				
+				// in this case, there is no dataset for this GUID in the DHT
+				LOGGER.info("Dataset for [" + guid + "] written to DHT: \n" + jwt);
+				
+				DHTManager.getInstance().put(guid, jwt);
+				
+				JSONObject jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
+				return jsonResponse.toString();
+			}
+		}
+		catch (UnsupportedJwtException | MalformedJwtException e)
+		{
+			LOGGER.error("Malformed JWT Exception: " + e.getMessage() + "\n" + e);
+			
+			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
+			return jsonResponse.toString();
+		}
+		catch (IntegrityException e)
+		{
+			LOGGER.error("Integrity Exception: " + e.getMessage() + "\n" + e);
+			
+			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
+			return jsonResponse.toString();
+		}
+		catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException | ClassNotFoundException | IOException e)
+		{
+			LOGGER.error("Error while putting data into DHT: " + e.getMessage() + "\n" + e);
+			
+			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
+			return jsonResponse.toString();
+		}
 	}
 
 	/**
@@ -98,7 +213,7 @@ public class RestService
 	 * @param socialRecord
 	 * @return
 	 */
-	@POST
+	/*@POST
 	//@Consumes("application/json") // there is no application/json+jwt content type yet
 	public String postData(String jwt)
 	{
@@ -181,7 +296,7 @@ public class RestService
 			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
 			return jsonResponse.toString();
 		}
-	}
+	}*/
 
 	/**
 	 * Takes valid JSON-file, verifies it and puts it into DHT; for updates and
@@ -190,7 +305,7 @@ public class RestService
 	 * @param dataset
 	 * @return
 	 */
-	@PUT
+	/*@PUT
 	//@Consumes("application/json") // there is no application/json+jwt content type yet
 	public String putData(String jwt)
 	{
@@ -278,5 +393,5 @@ public class RestService
 			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
 			return jsonResponse.toString();
 		}
-	}
+	}*/
 }
