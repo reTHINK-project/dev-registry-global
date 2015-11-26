@@ -73,7 +73,7 @@ public class RestService
 					try
 					{
 						jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
-						jsonResponse.put("socialRecord", jwt);
+						jsonResponse.put("data", jwt);
 					}
 					catch (JSONException e)
 					{
