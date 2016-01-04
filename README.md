@@ -16,20 +16,27 @@ Writes (creates and updates) a dataset (a signed JWT) for the given GUID
 The dataset is expected to be a valid JSON Object of the following form:
 
   {
-	  "guid": "1V3G0H7EPFG55W52LUG5SN0ZFVTVMQTTZ6Q5TV5BBTIP05IA0E",
-	  "UserIDs": ["reTHINK://sebastian.goendoer.net/", "reTHINK://facebook.com/fluffy123"],
+	  "guid": "EOOVh5C7JHZ51a0AUJQpMlR7cLSkTXDTPXmaLNA/khA=",
+	  "userIDs": ["reTHINK://sebastian.goendoer.net/", "reTHINK://facebook.com/fluffy123"],
 	  "lastUpdate":"2015-09-24T08:24:27+00:00",
     "timeout":"2016-09-24T08:24:27+00:00",
-	  "publicKey":"-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAriBpYpmZuLuEaW6wipYh7t+QWZjQRqxe952AgRGpnU5pcr2d4IWc76b2tSbB1xnh6VoW2BotWxYgMbVa6we05+LC6cOsHfLLn8wnZTGctqcKGoEDjnhnO0npBcDvr2W9OwtojzcU4GwGWUGTkznbog2zmLsAGS0WhKYG1kC0iZdc6pi8k/kBTmlL5dRVTWM3usZPwK6arVWRHad+AsIoLKX8qiBV0efRgV9BkqkYZqq4XN1rzPN1jwx3nsUzbpymriGw/6yBWcPK8S2V2wDsoDuFV7mPRK9lhseGgGKfvPbw3AvyEhZZYaImPYAlHterOwHXFWPMoQwXpbB0x6Z8vwIDAQAB-----END PUBLIC KEY-----",
-	  "salt": "eadf5f8e396724da",
+	  "publicKey":"-----BEGIN PUBLIC KEY-----MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEQpi2tn8QSSyVQEBhy5ocTyltXZpyGN979PgY6wwF0wz8e+RcDRwShpLNHy/qeiLouz2EZZoVXqeyswtw8ReT7g==-----END PUBLIC KEY-----",
+	  "salt": "HUCXPszYwKrP7Th99tac9gD5Q5zVP+YKP21+jeDtoyg=",
     "active": 1,
     "revoked": 0
   } 
 
 ## GUID
 
-The GUID is created by hashing the public key using PBKDF#2 and interpret it as base36. Example:  "1V3G0H7EPFG55W52LUG5SN0ZFVTVMQTTZ6Q5TV5BBTIP05IA0E"
+GUIDs can be created with the following algorithm: 
+
+- generate a ECDSA key pair over curve secp256k1
+- get the public key in format PKCS#8
+- remove all line breaks
+- get a string to be used as a salt
+- perform PKDF2 with SHA256 with 10000 iterations on the public key, using the salt
+- encode the result in Base64. This is the GUID
 
 ## JWT
 
-The Dataset is transferred as a JWT as a claim identified by "data". The JWT MUST be signed using the private key matching the publich key in the dataset.
+The Dataset is transferred as a JWT as a claim identified by "data". The JWT MUST be signed using the private key matching the public key in the dataset.
