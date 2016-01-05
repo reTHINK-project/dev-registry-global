@@ -35,7 +35,7 @@ GUIDs can be created with the following algorithm:
 - remove all line breaks
 - get a string to be used as a salt
 - perform PKDF2 with SHA256 with 10000 iterations on the public key, using the salt
-- encode the result in Base64. This is the GUID
+- encode the result in Base64url. This is the GUID
 
 ## JWT
 
