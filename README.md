@@ -15,16 +15,18 @@ Writes (creates and updates) a dataset (a signed JWT) for the given GUID
 
 The dataset is expected to be a valid JSON Object of the following form:
 
-  {
-	  "guid": "EOOVh5C7JHZ51a0AUJQpMlR7cLSkTXDTPXmaLNA/khA=",
-	  "userIDs": ["reTHINK://sebastian.goendoer.net/", "reTHINK://facebook.com/fluffy123"],
-	  "lastUpdate":"2015-09-24T08:24:27+00:00",
-    "timeout":"2016-09-24T08:24:27+00:00",
-	  "publicKey":"-----BEGIN PUBLIC KEY-----MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEQpi2tn8QSSyVQEBhy5ocTyltXZpyGN979PgY6wwF0wz8e+RcDRwShpLNHy/qeiLouz2EZZoVXqeyswtw8ReT7g==-----END PUBLIC KEY-----",
-	  "salt": "HUCXPszYwKrP7Th99tac9gD5Q5zVP+YKP21+jeDtoyg=",
-    "active": 1,
-    "revoked": 0
-  } 
+```
+{
+  "guid": "iTCLxibssOUXC2BeKctCxDRejbEw2YlvXsJQgdFa06c",
+  "userIDs": ["reTHINK://sebastian.goendoer.net/", "reTHINK://facebook.com/fluffy123"],
+  "lastUpdate":"2015-09-24T08:24:27+00:00",
+  "timeout":"2026-09-24T08:24:27+00:00",
+  "publicKey":"-----BEGIN PUBLIC KEY-----MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE0ptQ88nO42/WDfuNNiNrHlaCGTRswXvbvfY9Ttg9RkVfqhBVKK+V1tHkNPp/WRzIQKwLKDgAzujAxzN8LhI7Hg==-----END PUBLIC KEY-----",
+  "salt": "SpHuXwEGwrNcEcFoNS8Kv79PyGFlxi1vtRtSMt/GkuY=",
+  "active": 1,
+  "revoked": 0
+}
+```
 
 ## GUID
 
