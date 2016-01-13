@@ -8,6 +8,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
+import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.KeyPairManager;
 
 public class GUID
@@ -19,7 +20,7 @@ public class GUID
 	{
 		byte[] hash = null;
 		
-		key = KeyPairManager.stripKey(key);
+		key = ECDSAKeyPairManager.stripKey(key);
 		
 		try
 		{

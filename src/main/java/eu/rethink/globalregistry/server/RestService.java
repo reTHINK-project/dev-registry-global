@@ -120,10 +120,12 @@ public class RestService
 			JSONObject jwtPayload = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[1])));
 			LOGGER.info("payload: " + jwtPayload.toString());
 			
-			data = new JSONObject(jwtPayload.get("data").toString());
+			// the data claim is a base64url-encoded json object
+			data = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayload.get("data").toString()));
+			LOGGER.info("decoded payload: " + data.toString());
 			
 			// extract public key for signature verification
-			publicKey = KeyPairManager.decodePublicKey(data.getString("publicKey"));
+			publicKey = KeyPairManager.decodePublicKey(data.getString("publicKey")); // TODO build key from string
 			
 			// verify jwt
 			Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);
