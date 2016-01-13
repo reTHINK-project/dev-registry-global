@@ -38,15 +38,15 @@ public class RestService
 {
 	private static final Logger	LOGGER	= LoggerFactory.getLogger(RestService.class);
 	
-	/*@GET
+	@GET
 	@Produces("application/json")
 	public String index() throws URISyntaxException
 	{
 		// TODO multiple requests in one?
 		LOGGER.error("GET Request without GUID received");
-		JSONObject outerJson = new JSONObject(ResponseFactory.createInvalidRequestResponse());
+		JSONObject outerJson = new JSONObject(ResponseFactory.createStatusResponse());
 		return outerJson.toString();
-	}*/
+	}
 	
 	@GET
 	@Produces("application/json")

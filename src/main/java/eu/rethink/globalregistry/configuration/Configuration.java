@@ -13,10 +13,10 @@ public class Configuration
 	private Properties				prop;
 	
 	// fixed info
-	private static final String		versionName			= "0.0.1";
-	private static final int		versionNumber		= 1;
+	private static final String		versionName			= "0.0.2";
+	private static final int		versionNumber		= 2;
 	private static final String		versionCode			= "alpha";
-	private static final String		versionDate			= "2015-10-30";
+	private static final String		versionDate			= "2016-01-13";
 	private static final String		productName			= "reTHINK Global Registry";
 	private static final String		productNameShort	= "gReg";
 	private static String			filename			= "greg.config";
