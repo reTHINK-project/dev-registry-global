@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.rethink.globalregistry.dht.DHTManager;
 import eu.rethink.globalregistry.model.GUID;
+import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.IntegrityException;
 import eu.rethink.globalregistry.util.KeyPairManager;
 import io.jsonwebtoken.Jwts;
@@ -125,7 +126,7 @@ public class RestService
 			LOGGER.info("decoded payload: " + data.toString());
 			
 			// extract public key for signature verification
-			publicKey = KeyPairManager.decodePublicKey(data.getString("publicKey")); // TODO build key from string
+			publicKey = ECDSAKeyPairManager.decodePublicKey(data.getString("publicKey")); // TODO build key from string
 			
 			// verify jwt
 			Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);

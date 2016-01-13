@@ -1,11 +1,17 @@
 package eu.rethink.globalregistry.util;
 
+import io.jsonwebtoken.impl.Base64UrlCodec;
+
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -17,42 +23,45 @@ public class ECDSAKeyPairManager
 	public static final String	ALGORITHM			= "secp256k1";
 	public static final int		KEYSIZE				= 160;
 	
-	/*public static final String	PUBLICKEY_PREFIX	= "-----BEGIN PUBLIC KEY-----";
+	public static final String	PUBLICKEY_PREFIX	= "-----BEGIN PUBLIC KEY-----";
 	public static final String	PUBLICKEY_POSTFIX	= "-----END PUBLIC KEY-----";
 	public static final String	PRIVATEKEY_PREFIX	= "-----BEGIN PRIVATE KEY-----";
-	public static final String	PRIVATEKEY_POSTFIX	= "-----END PRIVATE KEY-----";*/
+	public static final String	PRIVATEKEY_POSTFIX	= "-----END PRIVATE KEY-----";
 	
-	/*public static KeyPair createKeyPair() throws NoSuchAlgorithmException
+	public static KeyPair createKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException
 	{
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
-		keyPairGenerator.initialize(KEYSIZE);
+		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDsA", "SC");
+		ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
+		keyGen.initialize(ecSpec, new SecureRandom());
 		
-		return keyPairGenerator.genKeyPair();
-	}*/
+		return keyGen.generateKeyPair();
+	}
 	
 	/**
-	 * returns a String beginning with -----BEGIN PUBLIC KEY-----
+	 * returns a PKCS#8 String beginning with -----BEGIN PUBLIC KEY-----
 	 * 
 	 * @param key
 	 * @return
 	 */
-	/*public static String encodePublicKey(PublicKey key)
+	public static String encodePublicKey(PublicKey key)
 	{
-		return PUBLICKEY_PREFIX + DatatypeConverter.printBase64Binary(key.getEncoded()) + PUBLICKEY_POSTFIX;
-	}*/
+		
+		return PUBLICKEY_PREFIX + Base64UrlCodec.BASE64URL.encode(key.getEncoded()) + PUBLICKEY_POSTFIX;
+	}
 	
 	/**
-	 * returns a String beginning with -----BEGIN PRIVATE KEY-----
+	 * returns a PKCS#8 String beginning with -----BEGIN PRIVATE KEY-----
 	 * 
 	 * @param key
 	 * @return
 	 */
-	/*public static String encodePrivateKey(PrivateKey key)
+	public static String encodePrivateKey(PrivateKey key)
 	{
-		return PRIVATEKEY_PREFIX + DatatypeConverter.printBase64Binary(key.getEncoded()) + PRIVATEKEY_POSTFIX;
-	}*/
+		return PRIVATEKEY_PREFIX + Base64UrlCodec.BASE64URL.encode(key.getEncoded()) + PRIVATEKEY_POSTFIX;
+	}
 	
-	/*public static PublicKey decodePublicKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
+	// TODO check if this even works
+	public static PublicKey decodePublicKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
 	{
 		key = key
 			.replace(PUBLICKEY_PREFIX, "")
@@ -64,9 +73,9 @@ public class ECDSAKeyPairManager
 		byte[] keyBytes = DatatypeConverter.parseBase64Binary(key);
 		
 		return KeyFactory.getInstance(ALGORITHM).generatePublic(new X509EncodedKeySpec(keyBytes));
-	}*/
+	}
 	
-	/*public static PrivateKey decodePrivateKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
+	public static PrivateKey decodePrivateKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
 	{
 		key = key
 			.replace(PRIVATEKEY_PREFIX, "")
@@ -78,7 +87,7 @@ public class ECDSAKeyPairManager
 		byte[] keyBytes = DatatypeConverter.parseBase64Binary(key);
 		
 		return KeyFactory.getInstance(ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(keyBytes));//X509EncodedKeySpec(keyBytes));
-	}*/
+	}
 	
 	public static String stripKey(String key)
 	{
