@@ -91,6 +91,8 @@ The Dataset is transferred as a JWT as a claim identified by "data". The JWT MUS
 - sign the JWT using the private key matching the enclosed public key
 - the result can be sent to the gReg via PUT
 
+see also: https://github.com/reTHINK-project/dev-registry-global/wiki/Test-dataset-jwt-creation-verification
+
 ## GUID
 
 GUIDs can be created with the following algorithm: 
