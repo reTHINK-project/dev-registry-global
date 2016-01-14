@@ -69,7 +69,7 @@ The dataset is expected to be a valid JSON Object of the following form:
 ```
 {
   "guid": "iTCLxibssOUXC2BeKctCxDRejbEw2YlvXsJQgdFa06c",
-  "userIDs": ["reTHINK://sebastian.goendoer.net/", "reTHINK://facebook.com/fluffy123"],
+  "userIDs": ["user://sebastian.goendoer.net/", "user://facebook.com/fluffy123"],
   "lastUpdate":"2015-09-24T08:24:27+00:00",
   "timeout":"2026-09-24T08:24:27+00:00",
   "publicKey":"-----BEGIN PUBLIC KEY-----MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE0ptQ88nO42/WDfuNNiNrHlaCGTRswXvbvfY9Ttg9RkVfqhBVKK+V1tHkNPp/WRzIQKwLKDgAzujAxzN8LhI7Hg==-----END PUBLIC KEY-----",
