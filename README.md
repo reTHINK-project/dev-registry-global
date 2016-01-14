@@ -15,7 +15,7 @@ Writes (creates and updates) a dataset (a signed JWT) for the given GUID
 
 The dataset is expected to be a valid JSON Object of the following form:
 
-# JSON Schema:
+### JSON Schema:
 
 ```
 {
@@ -60,7 +60,7 @@ The dataset is expected to be a valid JSON Object of the following form:
 	}
 ```
 
-# Example:
+### Example:
 
 ```
 {
@@ -75,7 +75,9 @@ The dataset is expected to be a valid JSON Object of the following form:
 }
 ```
 
-## create JWT
+The Dataset is transferred as a JWT as a claim identified by "data". The JWT MUST be signed using the private key matching the public key in the dataset.
+
+### create JWT
 
 - Create the dataset as a JSONObject as described above
 - serialize the JSONObject
@@ -95,7 +97,3 @@ GUIDs can be created with the following algorithm:
 - get a string to be used as a salt
 - perform PKDF2 with SHA256 with 10000 iterations on the public key, using the salt
 - encode the result in Base64url. This is the GUID
-
-## JWT
-
-The Dataset is transferred as a JWT as a claim identified by "data". The JWT MUST be signed using the private key matching the public key in the dataset.
