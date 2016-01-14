@@ -3,6 +3,10 @@ Global Registry
 
 ## Interfaces
 
+### GET /
+
+Will display version and info about the daemon
+
 ### GET /guid/{guid}
 
 Gets the dataset (a signed JWT) for the given GUID
