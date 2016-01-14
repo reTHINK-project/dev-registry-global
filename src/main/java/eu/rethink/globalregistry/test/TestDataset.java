@@ -18,6 +18,8 @@ import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 
 public class TestDataset
 {
+	protected static String gRegNode = "130.149.22.135:5002";
+	
 	public static void main(String args[])
 	{
 		try
@@ -66,6 +68,23 @@ public class TestDataset
 			
 			System.out.print("creating JWT... ");
 			String jwt = Jwts.builder().claim("data", encodedClaim).signWith(SignatureAlgorithm.ES256, keypair.getPrivate()).compact();
+			
+			System.out.println("ok");
+			System.out.println("\n  [ jwt: " + jwt + " ]\n");
+			
+			//////////////////////////////////////////////////
+			
+			System.out.print("Writing JWT to GlobalRegistry... ");
+			
+			GlobalRegistryAPI.putData(gRegNode, json.getString("guid"), jwt);
+			
+			System.out.println("ok");
+			
+			//////////////////////////////////////////////////
+			
+			System.out.print("Fetching JWT from GlobalRegistry... ");
+			
+			jwt = GlobalRegistryAPI.getData(gRegNode, json.getString("guid"));
 			
 			System.out.println("ok");
 			System.out.println("\n  [ jwt: " + jwt + " ]\n");
