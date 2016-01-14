@@ -26,7 +26,7 @@ public class TestDataset
 		{
 			//////////////////////////////////////////////////
 			
-			System.out.print("creating new ECDSA keypair...");
+			System.out.print("creating new ECDSA keypair... ");
 			
 			KeyPair keypair = ECDSAKeyPairManager.createKeyPair();
 			String publicKeyString = ECDSAKeyPairManager.encodePublicKey(keypair.getPublic());
