@@ -11,6 +11,7 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -20,8 +21,9 @@ import javax.xml.bind.DatatypeConverter;
 
 public class ECDSAKeyPairManager
 {
-	public static final String	ALGORITHM			= "secp256k1";
-	public static final int		KEYSIZE				= 160;
+	public static final String	ALGORITHM			= "ECDSA";
+	public static final String	CURVE				= "secp256k1";
+	//public static final int		KEYSIZE				= 160;
 	
 	public static final String	PUBLICKEY_PREFIX	= "-----BEGIN PUBLIC KEY-----";
 	public static final String	PUBLICKEY_POSTFIX	= "-----END PUBLIC KEY-----";
@@ -30,8 +32,10 @@ public class ECDSAKeyPairManager
 	
 	public static KeyPair createKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException
 	{
-		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDsA", "SC");
-		ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		
+		KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM, "BC");
+		ECGenParameterSpec ecSpec = new ECGenParameterSpec(CURVE);
 		keyGen.initialize(ecSpec, new SecureRandom());
 		
 		return keyGen.generateKeyPair();
