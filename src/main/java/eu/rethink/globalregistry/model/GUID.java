@@ -1,5 +1,7 @@
 package eu.rethink.globalregistry.model;
 
+import io.jsonwebtoken.impl.Base64UrlCodec;
+
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -34,7 +36,8 @@ public class GUID
 		{
 			e.printStackTrace();
 		}
-		return (new BigInteger(DatatypeConverter.printHexBinary(hash), 16)).toString(36).toUpperCase();
+		//return (new BigInteger(DatatypeConverter.printHexBinary(hash), 16)).toString(36).toUpperCase(); //<-- base36 encoding
+		return new String(Base64UrlCodec.BASE64URL.encode(hash));
 	}
 	
 	private static class PBKDF2

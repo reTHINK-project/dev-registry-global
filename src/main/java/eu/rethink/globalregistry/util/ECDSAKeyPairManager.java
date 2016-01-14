@@ -17,7 +17,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import javax.xml.bind.DatatypeConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class ECDSAKeyPairManager
 {
@@ -32,7 +32,7 @@ public class ECDSAKeyPairManager
 	
 	public static KeyPair createKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException
 	{
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		Security.addProvider(new BouncyCastleProvider());
 		
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM, "BC");
 		ECGenParameterSpec ecSpec = new ECGenParameterSpec(CURVE);
@@ -49,7 +49,7 @@ public class ECDSAKeyPairManager
 	 */
 	public static String encodePublicKey(PublicKey key)
 	{
-		
+		Security.addProvider(new BouncyCastleProvider());
 		return PUBLICKEY_PREFIX + Base64UrlCodec.BASE64URL.encode(key.getEncoded()) + PUBLICKEY_POSTFIX;
 	}
 	
@@ -61,12 +61,14 @@ public class ECDSAKeyPairManager
 	 */
 	public static String encodePrivateKey(PrivateKey key)
 	{
+		Security.addProvider(new BouncyCastleProvider());
 		return PRIVATEKEY_PREFIX + Base64UrlCodec.BASE64URL.encode(key.getEncoded()) + PRIVATEKEY_POSTFIX;
 	}
 	
 	// TODO check if this even works
 	public static PublicKey decodePublicKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
 	{
+		Security.addProvider(new BouncyCastleProvider());
 		key = key
 			.replace(PUBLICKEY_PREFIX, "")
 			.replace(PUBLICKEY_POSTFIX, "")
@@ -74,13 +76,14 @@ public class ECDSAKeyPairManager
 			.replace("\n", "")
 			.trim();
 		
-		byte[] keyBytes = DatatypeConverter.parseBase64Binary(key);
+		byte[] keyBytes = Base64UrlCodec.BASE64URL.decode(key);
 		
 		return KeyFactory.getInstance(ALGORITHM).generatePublic(new X509EncodedKeySpec(keyBytes));
 	}
 	
 	public static PrivateKey decodePrivateKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
 	{
+		Security.addProvider(new BouncyCastleProvider());
 		key = key
 			.replace(PRIVATEKEY_PREFIX, "")
 			.replace(PRIVATEKEY_POSTFIX, "")
@@ -88,9 +91,9 @@ public class ECDSAKeyPairManager
 			.replace("\n", "")
 			.trim();
 		
-		byte[] keyBytes = DatatypeConverter.parseBase64Binary(key);
+		byte[] keyBytes = Base64UrlCodec.BASE64URL.decode(key);
 		
-		return KeyFactory.getInstance(ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(keyBytes));//X509EncodedKeySpec(keyBytes));
+		return KeyFactory.getInstance(ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
 	}
 	
 	public static String stripKey(String key)
