@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.rethink.globalregistry.dht.DHTManager;
+import eu.rethink.globalregistry.model.Dataset;
+import eu.rethink.globalregistry.model.DatasetIntegrityException;
 import eu.rethink.globalregistry.model.GUID;
 import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.IntegrityException;
@@ -125,6 +127,8 @@ public class RestService
 			data = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayload.get("data").toString()));
 			LOGGER.info("decoded payload: " + data.toString());
 			
+			Dataset.checkDatasetValidity(data);
+			
 			// extract public key for signature verification
 			publicKey = ECDSAKeyPairManager.decodePublicKey(data.getString("publicKey")); // TODO build key from string
 			
@@ -194,7 +198,7 @@ public class RestService
 			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
 			return jsonResponse.toString();
 		}
-		catch (IntegrityException e)
+		catch (IntegrityException | DatasetIntegrityException e)
 		{
 			LOGGER.error("Integrity Exception: " + e.getMessage() + "\n" + e);
 			
