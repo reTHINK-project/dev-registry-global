@@ -21,7 +21,7 @@ public class Dataset
 		if(!json.has("revoked"))
 			throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
 		
-		if(json.getString("guid").equals(GUID.createGUID(json.getString("publicKey"), json.getString("slat"))))
+		if(json.getString("guid").equals(GUID.createGUID(json.getString("publicKey"), json.getString("salt"))))
 			throw new DatasetIntegrityException("guid does not match publicKey/salt");
 		
 		return true;
