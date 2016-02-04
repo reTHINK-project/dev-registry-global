@@ -161,7 +161,7 @@ public class RestService
 				
 				JSONObject jwtPayloadFromDHT = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(dhtResult.split("\\.")[1])));
 				
-				existingData = jwtPayloadFromDHT.getJSONObject("data");
+				existingData = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayloadFromDHT.get("data").toString()));
 				
 				// TODO also check the validity of THIS jwt and payload!
 				
