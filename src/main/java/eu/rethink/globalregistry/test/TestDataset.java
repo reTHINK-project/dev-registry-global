@@ -18,7 +18,9 @@ import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 
 public class TestDataset
 {
-	protected static String gRegNode = "130.149.22.135:5002";
+	protected static String gRegNode1 = "130.149.22.133:5002";
+	protected static String gRegNode2 = "130.149.22.134:5002";
+	protected static String gRegNode3 = "130.149.22.135:5002";
 	
 	public static void main(String args[])
 	{
@@ -74,17 +76,17 @@ public class TestDataset
 			
 			//////////////////////////////////////////////////
 			
-			System.out.print("Writing JWT to GlobalRegistry... ");
+			System.out.print("Writing new JWT to GlobalRegistry [Node1] (PUT new dataset)... ");
 			
-			GlobalRegistryAPI.putData(gRegNode, json.getString("guid"), jwt);
+			GlobalRegistryAPI.putData(gRegNode1, json.getString("guid"), jwt);
 			
 			System.out.println("ok");
 			
 			//////////////////////////////////////////////////
 			
-			System.out.print("Fetching JWT from GlobalRegistry... ");
+			System.out.print("Fetching JWT from GlobalRegistry [Node2] (GET existing dataset)... ");
 			
-			jwt = GlobalRegistryAPI.getData(gRegNode, json.getString("guid"));
+			jwt = GlobalRegistryAPI.getData(gRegNode2, json.getString("guid"));
 			
 			System.out.println("ok");
 			System.out.println("\n  [ jwt: " + jwt + " ]\n");
@@ -113,6 +115,50 @@ public class TestDataset
 			{
 				System.out.println("verification failed!");
 			}
+			
+			//////////////////////////////////////////////////
+						
+			System.out.print("editing Dataset... ");
+			
+			json = new JSONObject();
+			json.put("salt", salt);
+			json.put("userIDs", new JSONArray("[\"reTHINK://sebastian.goendoer.net/\",\"reTHINK://facebook.com/fluffy123\"]"));
+			json.put("lastUpdate", "2015-09-24T08:24:27+00:00");
+			json.put("timeout", "2027-09-24T08:24:27+00:00");
+			json.put("publicKey", publicKeyString);
+			json.put("active", 1);
+			json.put("revoked", 0);
+			json.put("guid", GUID.createGUID(publicKeyString, salt));
+			
+			System.out.println("ok");
+			System.out.println("\n  [ JSON: " + json.toString() + " ]\n");
+			
+			//////////////////////////////////////////////////
+			
+			System.out.print("encoding to base64URL... ");
+			
+			encodedClaim = new String(Base64UrlCodec.BASE64URL.encode(json.toString()));
+			
+			System.out.println("ok");
+			System.out.println("\n  [ encoded: " + encodedClaim + " ]\n");
+			
+			//////////////////////////////////////////////////
+			
+			System.out.print("creating JWT... ");
+			jwt = Jwts.builder().claim("data", encodedClaim).signWith(SignatureAlgorithm.ES256, keypair.getPrivate()).compact();
+			
+			System.out.println("ok");
+			System.out.println("\n  [ jwt: " + jwt + " ]\n");
+			
+			//////////////////////////////////////////////////
+			
+			System.out.print("Writing edited JWT to GlobalRegistry [Node3] (PUT existing dataset)... ");
+			
+			GlobalRegistryAPI.putData(gRegNode3, json.getString("guid"), jwt);
+			
+			System.out.println("ok");
+			
+			//////////////////////////////////////////////////
 		}
 		catch(Exception e)
 		{
