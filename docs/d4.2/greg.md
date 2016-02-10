@@ -95,7 +95,7 @@ The JSON schema for the dataset:
 ## GUID
 
 A GUID is derived from an ECDSA public key and a cryptographic salt by hashing it using the key derivation function PBKDF#2.
-First, an ECDSA key pair is generated using the curve “secp256k1”. The public key in PKCS#8-format with all linebreaks removed is then hashed with PBKDF#2 using SHA256 with 10.000 iterations and a cryptographic salt of a fixed length (16 characters). The output of 256 bit length, which is the GUID, is then encoded using Base64URL.
+First, an ECDSA key pair is generated using the curve “secp256k1”. The public key in PKCS#8-format with all linebreaks removed is then hashed with PBKDF#2 using SHA256 with 10.000 iterations and a cryptographic salt. The output of 256 bit length, encoded using Base64URL, is the GUID.
 
 ## Global Registry
 
