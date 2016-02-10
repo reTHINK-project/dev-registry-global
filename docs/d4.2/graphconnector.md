@@ -123,7 +123,7 @@ The contacts that are marked private are not reflected in the Bloom filter.
 
 The data model is visualized in the following figure:
 
-![Graph Connector Data Model](../Graph-Connector-Data-Model.png)
+![Graph Connector Data Model](Graph-Connector-Data-Model.png)
 
 ### Interfaces
 The Graph Connector offers methods for interacting with data about the user and about her contacts.
