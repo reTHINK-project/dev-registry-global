@@ -1,6 +1,6 @@
 package eu.rethink.globalregistry.util;
 
-import io.jsonwebtoken.impl.Base64UrlCodec;
+import io.jsonwebtoken.impl.Base64Codec;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyFactory;
@@ -50,9 +50,10 @@ public class ECDSAKeyPairManager
 	public static String encodePublicKey(PublicKey key)
 	{
 		Security.addProvider(new BouncyCastleProvider());
-		return PUBLICKEY_PREFIX + Base64UrlCodec.BASE64URL.encode(key.getEncoded()) + PUBLICKEY_POSTFIX;
+		return PUBLICKEY_PREFIX + Base64Codec.BASE64.encode(key.getEncoded()) + PUBLICKEY_POSTFIX;
 	}
 	
+	// TODO: maybe some error with this method
 	/**
 	 * returns a PKCS#8 String beginning with -----BEGIN PRIVATE KEY-----
 	 * 
@@ -62,10 +63,9 @@ public class ECDSAKeyPairManager
 	public static String encodePrivateKey(PrivateKey key)
 	{
 		Security.addProvider(new BouncyCastleProvider());
-		return PRIVATEKEY_PREFIX + Base64UrlCodec.BASE64URL.encode(key.getEncoded()) + PRIVATEKEY_POSTFIX;
+		return PRIVATEKEY_PREFIX + Base64Codec.BASE64.encode(key.getEncoded()) + PRIVATEKEY_POSTFIX;
 	}
 	
-	// TODO check if this even works
 	public static PublicKey decodePublicKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
 	{
 		Security.addProvider(new BouncyCastleProvider());
@@ -76,11 +76,12 @@ public class ECDSAKeyPairManager
 			.replace("\n", "")
 			.trim();
 		
-		byte[] keyBytes = Base64UrlCodec.BASE64URL.decode(key);
+		byte[] keyBytes = Base64Codec.BASE64.decode(key);
 		
 		return KeyFactory.getInstance(ALGORITHM).generatePublic(new X509EncodedKeySpec(keyBytes));
 	}
 	
+	// TODO: maybe some error with this method
 	public static PrivateKey decodePrivateKey(String key) throws InvalidKeySpecException, NoSuchAlgorithmException 
 	{
 		Security.addProvider(new BouncyCastleProvider());
@@ -91,7 +92,7 @@ public class ECDSAKeyPairManager
 			.replace("\n", "")
 			.trim();
 		
-		byte[] keyBytes = Base64UrlCodec.BASE64URL.decode(key);
+		byte[] keyBytes = Base64Codec.BASE64.decode(key);
 		
 		return KeyFactory.getInstance(ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
 	}
