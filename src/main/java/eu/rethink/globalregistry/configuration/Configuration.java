@@ -28,6 +28,7 @@ public class Configuration
 	private String					networkInterface;
 	private int						newDHTSystem;
 	private String					logPath;
+	private String                  blockchainClient;
 	
 	// private Scanner scan;
 	
@@ -107,6 +108,7 @@ public class Configuration
 			this.knownHosts = hosts.split(";");
 			this.networkInterface = prop.getProperty("network_interface");
 			this.newDHTSystem = Integer.parseInt(prop.getProperty("new_dht_system"));
+			this.blockchainClient = prop.getProperty("bc_client")
 			this.setLogPath(prop.getProperty("log_path"));
 			
 			input.close();
@@ -121,7 +123,7 @@ public class Configuration
 			this.networkInterface = "eth0";
 			this.newDHTSystem = 1;
 			this.logPath = "/usr/local/gReg/log";
-			
+
 			//e.printStackTrace();
 		}
 		
@@ -217,4 +219,6 @@ public class Configuration
 	{
 		return versionCode;
 	}
+
+	public String getBlockchainClient() { return blockchainClient; };
 }

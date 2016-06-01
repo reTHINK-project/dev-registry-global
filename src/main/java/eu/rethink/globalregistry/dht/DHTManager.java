@@ -53,7 +53,9 @@ public class DHTManager
 				.setPorts(Configuration.getInstance().getPortDHT())
 				.setEnableIndirectReplication(true)
 				.makeAndListen();
+
 		peer.getConfiguration().setBehindFirewall(true);
+
 
 		if (Configuration.getInstance().getNewDHTSystem() == 1)
 		{}
