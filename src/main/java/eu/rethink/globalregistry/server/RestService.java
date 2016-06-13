@@ -1,5 +1,6 @@
 package eu.rethink.globalregistry.server;
 
+import java.util.List;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
@@ -7,12 +8,13 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -24,11 +26,12 @@ import eu.rethink.globalregistry.model.DatasetIntegrityException;
 import eu.rethink.globalregistry.model.GUID;
 import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.IntegrityException;
-import eu.rethink.globalregistry.util.KeyPairManager;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.impl.Base64UrlCodec;
+import net.tomp2p.peers.PeerAddress;
 
 /**
  * RestSerivce of GlobalRegistry.
@@ -48,6 +51,15 @@ public class RestService
 		// TODO multiple requests in one?
 		LOGGER.error("GET Request without GUID received");
 		JSONObject outerJson = new JSONObject(ResponseFactory.createStatusResponse());
+		List<PeerAddress> AllNeighbors = DHTManager.getInstance().getAllNeighbors();
+		
+		JSONArray connectedNodes = new JSONArray();
+ 		for(PeerAddress neighbor : AllNeighbors)
+		{
+ 			connectedNodes.put(neighbor.inetAddress().getHostAddress());
+		}
+ 		outerJson.put("connectedNodes", connectedNodes);
+ 		
 		return outerJson.toString();
 	}
 	

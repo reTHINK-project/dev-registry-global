@@ -118,8 +118,9 @@
 		</dependency>
 		<dependency>
 			<groupId>net.tomp2p</groupId>
-			<artifactId>TomP2P</artifactId>
-			<version>4.4</version>
+			 <artifactId>tomp2p-all</artifactId>
+             <version>5.0-Beta8</version>
+            <scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
