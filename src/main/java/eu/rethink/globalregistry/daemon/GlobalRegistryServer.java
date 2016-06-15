@@ -40,7 +40,7 @@ public class GlobalRegistryServer implements Daemon
 		OptionBuilder.withLongOpt("cfg");
 		OptionBuilder
 				.withDescription("required: give the path to the folder that contains greg.config");
-		OptionBuilder.isRequired();
+		//OptionBuilder.isRequired();
 		OptionBuilder.hasArg();
 		Option cfgOption = OptionBuilder.create("c");
 
@@ -60,33 +60,41 @@ public class GlobalRegistryServer implements Daemon
 				System.exit(0);
 			}
 			
-			if (cmd.hasOption("c"))
+			String configFile;
+			
+			if(cmd.hasOption("c"))
 			{
 				System.out.println(cmd.getOptionValue("c"));
-				System.out.println("Initializing reTHINK  - loading greg.config");
-				Configuration config = Configuration.getInstance();
-				String pathToConfig = cmd.getOptionValue("c");
-				String fullPathToConfig = pathToConfig + File.separator + "greg.config";
-				System.out.println("Trying to load config file: " + fullPathToConfig);
-				if (!Configuration.propFileExists(fullPathToConfig))
-				{
-					System.out
-							.println("No configuration file found. Please create valid greg.config and provide path to it via command line option -c.");
-					System.exit(0);
-				}
-				Configuration.getInstance().loadConfigurationFile();
-				// setup logging
-				System.setProperty("loginfofile", config.getLogPath() + "log-info.log");
-				System.setProperty("logdebugfile", config.getLogPath() + "log-debug.log");
-				LOGGER = LoggerFactory.getLogger(GlobalRegistryServer.class);
-
-				LOGGER.info(Configuration.getInstance().getProductName() + " "
-						+ Configuration.getInstance().getVersionName() + " "
-						+ Configuration.getInstance().getVersionCode());
-				LOGGER.info("Build #" + Configuration.getInstance().getVersionNumber() + " ("
-						+ Configuration.getInstance().getVersionDate() + ")\n");
+				configFile = cmd.getOptionValue("c");
 			}
+			else
+			{
+				configFile = Configuration.getInstance().getConfigFilename();
+			}
+				
+			System.out.println("Initializing SONIC - loading gsls.config");
+			String pathToConfig = configFile;
+			String fullPathToConfig = pathToConfig + File.separator + "gsls.config";
+			//String fullPathToConfig = pathToConfig;
+			System.out.println("Trying to load config file: " + fullPathToConfig);
+			
+			if(!Configuration.propFileExists(fullPathToConfig))
+			{
+				System.out.println("No configuration file found. Please create valid gsls.config and provide path to it via command line option -c.");
+				System.exit(0);
+			}
+			
+			Configuration.getInstance().loadConfigurationFile();
+			// setup logging
+			System.setProperty("loginfofile", Configuration.getInstance().getLogPath() + "log-info.log");
+			System.setProperty("logdebugfile", Configuration.getInstance().getLogPath() + "log-debug.log");
+			LOGGER = LoggerFactory.getLogger(GlobalRegistryServer.class);
 
+			LOGGER.info(Configuration.getInstance().getProductName() + " "
+					+ Configuration.getInstance().getVersionName() + " "
+					+ Configuration.getInstance().getVersionCode());
+			LOGGER.info("Build #" + Configuration.getInstance().getVersionNumber() + " ("
+					+ Configuration.getInstance().getVersionDate() + ")\n");
 		}
 		catch (ParseException e1)
 		{
