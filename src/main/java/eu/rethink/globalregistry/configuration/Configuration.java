@@ -13,10 +13,10 @@ public class Configuration
 	private Properties				prop;
 	
 	// fixed info
-	private static final String		versionName			= "0.0.2";
-	private static final int		versionNumber		= 2;
-	private static final String		versionCode			= "alpha";
-	private static final String		versionDate			= "2016-01-13";
+	private static final String		versionName			= "0.1.1";
+	private static final int		versionNumber		= 1234;
+	private static final String		versionCode			= "phase1";
+	private static final String		versionDate			= "2016-01-15";
 	private static final String		productName			= "reTHINK Global Registry";
 	private static final String		productNameShort	= "gReg";
 	private static String			filename			= "greg.config";
@@ -75,6 +75,11 @@ public class Configuration
 	public String getLogPath()
 	{
 		return logPath;
+	}
+	
+	public String getConfigFilename()
+	{
+		return filename;
 	}
 	
 	public void setLogPath(String logPath)

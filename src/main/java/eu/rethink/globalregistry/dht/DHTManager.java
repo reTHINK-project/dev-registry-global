@@ -3,24 +3,30 @@ package eu.rethink.globalregistry.dht;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Random;
 
+
+import net.tomp2p.dht.FutureGet;
+import net.tomp2p.dht.FuturePut;
+import net.tomp2p.dht.PeerBuilderDHT;
+import net.tomp2p.dht.PeerDHT;
 import eu.rethink.globalregistry.configuration.Configuration;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureBootstrap;
-import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureDiscover;
-import net.tomp2p.p2p.Peer;
-import net.tomp2p.p2p.PeerMaker;
 import net.tomp2p.peers.Number160;
+import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.storage.Data;
+import net.tomp2p.p2p.PeerBuilder;
+import net.tomp2p.replication.IndirectReplication;
 
 public class DHTManager
 {
 	private static DHTManager	instance	= null;
 
-	private Peer				peer;
-
+ 	private PeerDHT peer;
+ 	
 	private DHTManager()
 	{
 
@@ -49,12 +55,11 @@ public class DHTManager
 		 * new IndirectReplication(peer).start();
 		 */
 		
-		peer = new PeerMaker(new Number160(rand))
-				.setPorts(Configuration.getInstance().getPortDHT())
-				.setEnableIndirectReplication(true)
-				.makeAndListen();
-		peer.getConfiguration().setBehindFirewall(true);
-
+		peer = new PeerBuilderDHT(
+ 				new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
+ 
+		new IndirectReplication(peer).start();
+		
 		if (Configuration.getInstance().getNewDHTSystem() == 1)
 		{}
 		else
@@ -63,9 +68,9 @@ public class DHTManager
 			{
 				InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[i]);
 				
-				FutureDiscover futureDiscover = peer.discover().setInetAddress(address).setPorts(Configuration.getInstance().getPortDHT()).start();
+				FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
 				futureDiscover.awaitUninterruptibly();
-				FutureBootstrap futureBootstrap = peer.bootstrap().setInetAddress(address).setPorts(Configuration.getInstance().getPortDHT()).start();
+				FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
 				futureBootstrap.awaitUninterruptibly();
 			}
 		}
@@ -83,12 +88,13 @@ public class DHTManager
 	 */
 	public String get(String key) throws ClassNotFoundException, IOException
 	{
-		FutureDHT futureGet = peer.get(Number160.createHash(key)).start();
+		
+		FutureGet futureGet = peer.get(Number160.createHash(key)).start();			
 		futureGet.awaitUninterruptibly();
 		// TODO: use non-blocking?
 		if (futureGet.isSuccess())
 		{
-			return futureGet.getData().getObject().toString();
+			return futureGet.data().object().toString();
 		}
 		return null; // TODO: decide on sentinel value
 	}
@@ -104,7 +110,8 @@ public class DHTManager
 	 */
 	public void put(String key, String value) throws IOException
 	{
-		peer.put(Number160.createHash(key)).setData(new Data(value)).start().awaitUninterruptibly();
+		FuturePut futurePut = peer.put(Number160.createHash(key)).data(new Data(value)).start();
+		futurePut.awaitUninterruptibly();
 		// TODO: use non-blocking?
 	}
 	
@@ -117,6 +124,11 @@ public class DHTManager
 	public void delete(String key) throws IOException
 	{
 		peer.remove(Number160.createHash(key)).start();
+	}
+
+	public List<PeerAddress> getAllNeighbors() {
+		
+		return peer.peerBean().peerMap().all(); 
 	}
 
 }
