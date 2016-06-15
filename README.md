@@ -1,6 +1,16 @@
 # dev-registry-global
 Global Registry
 
+## Changelog
+
+### 0.1.1
+
+- Status window now shows connected nodes
+- TomP2P 5.0 beta8
+- Updated libraries (Jetty/Netty/etc)
+- Code cleaned up
+- Additional tests for JWT/Dataset validation
+
 ## Interfaces
 
 ### GET /
