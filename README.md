@@ -11,6 +11,10 @@ Global Registry
 - Code cleaned up
 - Additional tests for JWT/Dataset validation
 
+### 0.1.0
+
+- Initial release
+
 ## Interfaces
 
 ### GET /
