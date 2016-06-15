@@ -74,7 +74,7 @@ public class GlobalRegistryServer implements Daemon
 				
 			System.out.println("Initializing SONIC - loading gsls.config");
 			String pathToConfig = configFile;
-			String fullPathToConfig = pathToConfig + File.separator + "gsls.config";
+			String fullPathToConfig = pathToConfig + File.separator + "greg.config";
 			//String fullPathToConfig = pathToConfig;
 			System.out.println("Trying to load config file: " + fullPathToConfig);
 			
