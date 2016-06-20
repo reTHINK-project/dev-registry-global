@@ -3,6 +3,10 @@ Global Registry
 
 ## Changelog
 
+### 0.1.1.a
+
+- fixed a bug with the PUT interface
+
 ### 0.1.1
 
 - Status window now shows connected nodes
