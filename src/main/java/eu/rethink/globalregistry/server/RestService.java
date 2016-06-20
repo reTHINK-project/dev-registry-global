@@ -82,17 +82,47 @@ public class RestService
 				
 				if(jwt != null)
 				{
-					// TODO finish check of "active" flag and add handling of migrating records (active=2)
-					// check if social record is inactive and then return
-					// n/a
+					// TODO finish check of "active" flag
+					// TODO check for outdated data
 					try
 					{
+						JSONObject data;
+						PublicKey publicKey;
+						
+						JSONObject jwtHeader = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[0])));
+						LOGGER.info("header: " + jwtHeader.toString());
+						
+						// step by step:
+						JSONObject jwtPayload = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[1])));
+						LOGGER.info("payload: " + jwtPayload.toString());
+						
+						// the data claim is a base64url-encoded json object
+						data = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayload.get("data").toString()));
+						LOGGER.info("decoded payload: " + data.toString());
+						
+						Dataset.checkDatasetValidity(data);
+						
+						// extract public key for signature verification
+						publicKey = ECDSAKeyPairManager.decodePublicKey(data.getString("publicKey")); // TODO build key from string
+						
+						// verify jwt
+						Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);
+						LOGGER.info("token verified");
+						
 						jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
 						jsonResponse.put("data", jwt);
 					}
-					catch (JSONException e)
+					catch (JSONException | DatasetIntegrityException e)
 					{
 						LOGGER.error("Faulty data in DHT! This should not happen! " + e.getMessage());
+					}
+					catch (InvalidKeySpecException e)
+					{
+						e.printStackTrace();
+					}
+					catch (NoSuchAlgorithmException e)
+					{
+						e.printStackTrace();
 					}
 				}
 			}
