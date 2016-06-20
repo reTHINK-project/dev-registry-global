@@ -42,39 +42,21 @@ public class DHTManager
 	public DHTManager initDHT() throws IOException
 	{
 		Random rand = new Random();
-		
 		Bindings bind = new Bindings();
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
+		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
 		
-		// To do this with tomP2P5: https://github.com/tomp2p/TomP2P/blob/master/examples/src/main/java/net/tomp2p/examples/ExampleIndirectReplication.java
-		/*
-		 * peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand))
-		 * 			.ports(Configuration.getInstance().getPortDHT())
-		 * 			.start())
-		 * 			.start();
-		 * new IndirectReplication(peer).start();
-		 */
-		
-		peer = new PeerBuilderDHT(
- 				new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
- 
 		new IndirectReplication(peer).start();
 		
-		if (Configuration.getInstance().getNewDHTSystem() == 1)
-		{}
-		else
+		for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
 		{
-			for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
-			{
-				InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[i]);
-				
-				FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
-				futureDiscover.awaitUninterruptibly();
-				FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
-				futureBootstrap.awaitUninterruptibly();
-			}
+			InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);
+			FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
+			futureDiscover.awaitUninterruptibly();
+			FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
+			futureBootstrap.awaitUninterruptibly();
 		}
-
+		
 		return this;
 	}
 
@@ -88,14 +70,15 @@ public class DHTManager
 	 */
 	public String get(String key) throws ClassNotFoundException, IOException
 	{
-		
-		FutureGet futureGet = peer.get(Number160.createHash(key)).start();			
+		FutureGet futureGet = peer.get(Number160.createHash(key)).start();
 		futureGet.awaitUninterruptibly();
+		
 		// TODO: use non-blocking?
-		if (futureGet.isSuccess())
+		if(futureGet.isSuccess() && futureGet.data() != null)
 		{
 			return futureGet.data().object().toString();
 		}
+		
 		return null; // TODO: decide on sentinel value
 	}
 
@@ -115,6 +98,7 @@ public class DHTManager
 		// TODO: use non-blocking?
 	}
 	
+	
 	/**
 	 * removes a key from the DHT. Should ONLY be used for the tests
 	 * 
@@ -125,10 +109,9 @@ public class DHTManager
 	{
 		peer.remove(Number160.createHash(key)).start();
 	}
-
+	
 	public List<PeerAddress> getAllNeighbors() {
 		
 		return peer.peerBean().peerMap().all(); 
 	}
-
 }
