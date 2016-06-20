@@ -3,7 +3,7 @@ Global Registry
 
 ## Changelog
 
-### 0.1.1.a
+### 0.1.1a
 
 - fixed a bug with the PUT interface
 
