@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
+import io.netty.channel.ChannelHandler;
+import io.netty.util.concurrent.EventExecutorGroup;
+import main.java.eu.rethink.globalregistry.certification.CertificateMapFilter;
+import net.tomp2p.connection.PipelineFilter;
 import net.tomp2p.dht.FutureGet;
 import net.tomp2p.dht.FuturePut;
 import net.tomp2p.dht.PeerBuilderDHT;
@@ -15,11 +20,11 @@ import eu.rethink.globalregistry.configuration.Configuration;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureBootstrap;
 import net.tomp2p.futures.FutureDiscover;
-import net.tomp2p.peers.Number160;
-import net.tomp2p.peers.PeerAddress;
+import net.tomp2p.peers.*;
 import net.tomp2p.storage.Data;
 import net.tomp2p.p2p.PeerBuilder;
 import net.tomp2p.replication.IndirectReplication;
+import net.tomp2p.utils.Pair;
 
 public class DHTManager
 {
@@ -44,10 +49,21 @@ public class DHTManager
 		Random rand = new Random();
 		Bindings bind = new Bindings();
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
-		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
-		
+
+		if(Configuration.getInstance().isBlockchainActive()) {
+			Number160 id = new Number160(Configuration.getInstance().getPeerID());
+			PeerMap peerMap = new PeerMap(new PeerMapConfiguration(id).addMapPeerFilter(new CertificateMapFilter()));
+			PeerBuilder peerBuilder= new PeerBuilder(new Number160(Configuration.getInstance().getPeerID())).peerMap(peerMap)
+					.ports(Configuration.getInstance().getPortDHT());
+
+			peer = new PeerBuilderDHT(peerBuilder.start()).start();
+		} else {
+			peer = new PeerBuilderDHT(new PeerBuilder(new Number160(Configuration.getInstance().getPeerID())).ports(Configuration.getInstance().getPortDHT()).start()).start();
+		}
+
+
 		new IndirectReplication(peer).start();
-		
+
 		for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
 		{
 			InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);

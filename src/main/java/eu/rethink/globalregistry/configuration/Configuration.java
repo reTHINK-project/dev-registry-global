@@ -28,7 +28,10 @@ public class Configuration
 	private String					networkInterface;
 	private int						newDHTSystem;
 	private String					logPath;
-	
+	private String 					peerID;
+	private boolean 				blockchainActive;
+	private String 					blockchainClient;
+
 	// private Scanner scan;
 	
 	private Configuration()
@@ -92,7 +95,8 @@ public class Configuration
 	// /////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// // TODO: validate config data
-	
+
+
 	/**
 	 * Loads configuration file.
 	 */
@@ -113,7 +117,10 @@ public class Configuration
 			this.networkInterface = prop.getProperty("network_interface");
 			this.newDHTSystem = Integer.parseInt(prop.getProperty("new_dht_system"));
 			this.setLogPath(prop.getProperty("log_path"));
-			
+			this.blockchainClient = prop.getProperty("bc_client");
+			this.peerID = prop.getProperty("peerID");
+			this.blockchainActive = Integer.parseInt(prop.getProperty("blockchain_active")) == 1;
+
 			input.close();
 		}
 		catch (IOException e)
@@ -221,5 +228,17 @@ public class Configuration
 	public String getVersionCode()
 	{
 		return versionCode;
+	}
+
+	public String getBlockchainClient() {
+		return blockchainClient;
+	}
+
+	public String getPeerID() {
+		return peerID;
+	}
+
+	public boolean isBlockchainActive() {
+		return blockchainActive;
 	}
 }
