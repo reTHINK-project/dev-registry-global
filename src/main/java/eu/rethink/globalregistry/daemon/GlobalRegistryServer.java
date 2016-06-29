@@ -46,11 +46,6 @@ public class GlobalRegistryServer implements Daemon {
 			DHTManager.getInstance().initDHT();
 			LOGGER.info("DHT initialized successfully");
 
-			// init GlobalRegistry server
-			LOGGER.info("initializing Global Registry server... ");
-
-			JettyServer.start();
-
 			// put dataset
 			if (Configuration.getInstance().getStartDatabase() == 1) {
 
@@ -118,6 +113,11 @@ public class GlobalRegistryServer implements Daemon {
 					}
 				}
 			}
+			// init GlobalRegistry server
+			LOGGER.info("initializing Global Registry server... ");
+			// JettyServer.start();
+			JettyServer.start();
+
 		} catch (
 
 		Exception e)
