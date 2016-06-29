@@ -31,12 +31,11 @@ public class Configuration {
 	
 
 	//Database config
-	private  int startDatabase = 0 ;
-	private  String database = "";
-	private  String username = "";
-	private  String password = "";
-	private  String table = "";
-
+	private  int db_backup = 0 ;
+	private  String db_database = "";
+	private  String db_table = "";
+	private  String db_user = "";
+	private  String db_pass = "";
 	
 	// private Scanner scan;
 
@@ -83,21 +82,21 @@ public class Configuration {
 	}
 	
 	public int getStartDatabase() {
-		return startDatabase;
+		return db_backup;
 	}
 
 	public String getDatabase() {
-		return database;
+		return db_database;
 	}
 
 	public String getUsername() {
-		return username;
+		return db_user;
 	}
 	public String getPassword() {
-		return password;
+		return db_pass;
 	}
 	public String getTable() {
-		return table;
+		return db_table;
 	}
 
 
@@ -133,11 +132,11 @@ public class Configuration {
 				String hosts = prop.getProperty("known_hosts");
 				this.knownHosts = hosts.split(";");
 				this.networkInterface = prop.getProperty("network_interface");
-				this.startDatabase = Integer.parseInt(prop.getProperty("start_database"));
-				this.table = prop.getProperty("table");
-				this.database = prop.getProperty("database");
-				this.username = prop.getProperty("username");
-				this.password = prop.getProperty("password");
+				this.db_backup = Integer.parseInt(prop.getProperty("start_database"));
+				this.db_table = prop.getProperty("table");
+				this.db_database = prop.getProperty("database");
+				this.db_user = prop.getProperty("username");
+				this.db_pass = prop.getProperty("password");
 				this.setLogPath(prop.getProperty("log_path"));
 
 				input.close();
