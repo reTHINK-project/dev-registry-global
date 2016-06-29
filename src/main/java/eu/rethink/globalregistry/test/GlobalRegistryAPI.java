@@ -81,8 +81,10 @@ public class GlobalRegistryAPI
 			wr.writeBytes(jwt);
 			wr.close();
 			
+			
 			//Get Response
 			InputStream is = connection.getInputStream();
+			
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 			StringBuilder response = new StringBuilder();
 			

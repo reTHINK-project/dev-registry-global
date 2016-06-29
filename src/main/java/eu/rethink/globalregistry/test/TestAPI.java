@@ -71,8 +71,14 @@ public class TestAPI
 			
 			System.out.print("Writing new JWT to GlobalRegistry [Node1] (PUT new dataset)... ");
 			
-			GlobalRegistryAPI.putData(gRegNode1, json.getString("guid"), jwt);
+			System.out.println("################");
+			System.out.println(gRegNode1);
+			System.out.println(json.getString("guid"));
+			System.out.println(jwt);
+			System.out.println("###########");
 			
+			GlobalRegistryAPI.putData(gRegNode1, json.getString("guid"), jwt);
+		
 			System.out.println("ok");
 			
 			//////////////////////////////////////////////////
