@@ -21,6 +21,12 @@ Global Registry
 
 ## Interfaces
 
+## Testbed
+
+- 130.149.22.133:5002
+- 130.149.22.134:5002
+- 130.149.22.135:5002
+
 ### GET /
 
 Will display version and info about the daemon
