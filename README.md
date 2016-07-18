@@ -95,8 +95,8 @@ The dataset is expected to be a valid JSON Object of the following form:
 				"type": "string"
 			},
 			"salt": {
-				"id": "http://jsonschema.net/rethink/greg/data/timeout",
-				"type": "salt"
+				"id": "http://jsonschema.net/rethink/greg/data/salt",
+				"type": "string"
 			},
 			"active": {
 				"id": "http://jsonschema.net/rethink/greg/data/active",
