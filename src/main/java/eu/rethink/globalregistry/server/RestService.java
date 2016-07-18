@@ -23,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.rethink.globalregistry.configuration.Configuration;
+
 import eu.rethink.globalregistry.dao.AccessManager;
+
 import eu.rethink.globalregistry.dht.DHTManager;
 import eu.rethink.globalregistry.model.Dataset;
 import eu.rethink.globalregistry.model.DatasetIntegrityException;
@@ -59,8 +61,11 @@ public class RestService {
 		for (PeerAddress neighbor : AllNeighbors) {
 			connectedNodes.put(neighbor.inetAddress().getHostAddress());
 		}
-		outerJson.put("connectedNodes", connectedNodes);
 
+ 		outerJson.put("version", Configuration.getInstance().getVersionName());
+ 		outerJson.put("build", Configuration.getInstance().getVersionNumber());
+ 		outerJson.put("connectedNodes", connectedNodes);
+ 		
 		return outerJson.toString();
 	}
 
