@@ -31,10 +31,10 @@ public class Configuration {
 	
 
 	//Database config
-	private  int db_backup = 0 ;
-	private  String db_database = "";
-	private  String db_table = "";
-	private  String db_user = "";
+	private  int db_backup = 1 ;
+	private  String db_database = "globalregistry";
+	private  String db_table = "dataset";
+	private  String db_user = "root";
 	private  String db_pass = "";
 	
 	// private Scanner scan;

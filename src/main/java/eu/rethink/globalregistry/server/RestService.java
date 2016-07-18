@@ -106,7 +106,7 @@ public class RestService {
 																										// build
 																										// key
 																										// from
-																										// string
+						//TODO : time out 																				// string
 
 						// verify jwt
 						Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);
