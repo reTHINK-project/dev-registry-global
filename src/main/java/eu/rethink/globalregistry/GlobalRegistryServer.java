@@ -1,4 +1,4 @@
-package eu.rethink.globalregistry.daemon;
+package eu.rethink.globalregistry;
 
 import java.io.File;
 
@@ -10,9 +10,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.daemon.Daemon;
-import org.apache.commons.daemon.DaemonContext;
-import org.apache.commons.daemon.DaemonInitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +21,9 @@ import eu.rethink.globalregistry.dht.DHTManager;
  * Main class of the GlobalRegistryDaemon.
  *
  */
-public class GlobalRegistryServer implements Daemon
+public class GlobalRegistryServer
 {
-	private static Logger	LOGGER;
+	private static Logger LOGGER;
 
 	public static void main(String[] args)
 	{
@@ -46,10 +43,10 @@ public class GlobalRegistryServer implements Daemon
 
 		options.addOption(helpOption);
 		options.addOption(cfgOption);
-		
+
 		// parse comman line parameters
 		CommandLineParser parser = new BasicParser();
-		
+
 		try
 		{
 			CommandLine cmd = parser.parse(options, args);
@@ -59,9 +56,9 @@ public class GlobalRegistryServer implements Daemon
 				formater.printHelp("gRegs help", options);
 				System.exit(0);
 			}
-			
+
 			String configFile;
-			
+
 			if(cmd.hasOption("c"))
 			{
 				System.out.println(cmd.getOptionValue("c"));
@@ -71,23 +68,23 @@ public class GlobalRegistryServer implements Daemon
 			{
 				configFile = Configuration.getInstance().getConfigFilename();
 			}
-				
+
 			System.out.println("Initializing GlobalRegistry - loading greg.config");
 			String pathToConfig = configFile;
 			String fullPathToConfig = pathToConfig + File.separator + "greg.config";
 			//String fullPathToConfig = pathToConfig;
 			System.out.println("Trying to load config file: " + fullPathToConfig);
-			
+
 			if(!Configuration.propFileExists(fullPathToConfig))
 			{
 				System.out.println("No configuration file found. Please create valid gsls.config and provide path to it via command line option -c.");
 				System.exit(0);
 			}
-			
+
 			Configuration.getInstance().loadConfigurationFile();
 			// setup logging
-			System.setProperty("loginfofile", Configuration.getInstance().getLogPath() + "log-info.log");
-			System.setProperty("logdebugfile", Configuration.getInstance().getLogPath() + "log-debug.log");
+			// System.setProperty("loginfofile", Configuration.getInstance().getLogPath() + "log-info.log");
+			// System.setProperty("logdebugfile", Configuration.getInstance().getLogPath() + "log-debug.log");
 			LOGGER = LoggerFactory.getLogger(GlobalRegistryServer.class);
 
 			LOGGER.info(Configuration.getInstance().getProductName() + " "
@@ -120,32 +117,4 @@ public class GlobalRegistryServer implements Daemon
 			e.printStackTrace();
 		}
 	}
-
-	@Override
-	public void init(DaemonContext arg0) throws DaemonInitException, Exception
-	{
-		System.out.println("deamon: init()");
-		String arguments[] = arg0.getArguments();
-		System.out.println(arguments);
-		GlobalRegistryServer.main(arguments);
-	}
-
-	@Override
-	public void start() throws Exception
-	{
-		System.out.println("deamon: start()");
-	}
-
-	@Override
-	public void stop() throws Exception
-	{
-		System.out.println("deamon: exception()");
-	}
-
-	@Override
-	public void destroy()
-	{
-		System.out.println("deamon: destroy()");
-	}
-
 }
