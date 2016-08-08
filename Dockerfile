@@ -8,7 +8,9 @@ WORKDIR /build
 
 # Dependencies
 ADD pom.xml /build/pom.xml
-ADD greg.config /build/greg.config
+ADD node-1-config /build/node-1-config
+ADD node-2-config /build/node-2-config
+ADD docker-entrypoint.sh /
 RUN ["mvn", "dependency:resolve"]
 RUN ["mvn", "verify"]
 
@@ -18,4 +20,6 @@ RUN ["mvn", "package"]
 
 EXPOSE 5001
 EXPOSE 5002
-CMD ["java", "-jar", "/build/target/gReg/gReg.jar", "-c", "/build/"]
+
+RUN ["ls", "/build/"]
+CMD ["sh", "/docker-entrypoint.sh"]
