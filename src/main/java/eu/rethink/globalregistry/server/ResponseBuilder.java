@@ -75,7 +75,7 @@ public class ResponseBuilder
 	 */
 	public ResponseBuilder description(String description)
 	{
-		this.Description = Description;
+		this.Description = description;
 		return this;
 	}
 	
@@ -154,7 +154,10 @@ public class ResponseBuilder
 		{
 			this.Description = Description;
 		}
+		
+		public String printResponse()
+		{
+			return "{\"Code\":" + this.Code + ",\"Description\":" + this.Description + ",\"Value\":" + this.Value + "}";
+		}
 	}
-	
-	private JSONObject response;
 }

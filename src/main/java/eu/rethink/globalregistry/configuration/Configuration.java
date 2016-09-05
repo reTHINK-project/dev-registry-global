@@ -52,7 +52,7 @@ public class Configuration
 	// /////////////////////////////////////////////////////////////////////////////////////////////
 
 	public int getPortDHT() {
-		return 5002;
+		return 5001;
 	}
 
 	public int getPortServer() {
@@ -112,10 +112,10 @@ public class Configuration
 		String fullPathToConfig = pathToConfig + File.separator + "greg.config";
 
 		if (!Configuration.propFileExists(fullPathToConfig)) {
-			this.portServer = 5001;
+			this.portServer = 5002;
 			this.knownHosts = new String[0];
 			this.networkInterface = "eth0";
-			this.logPath = "/usr/local/gReg/log";
+			this.logPath = "/usr/local/gReg/logs";
 			
 		} else {
 
@@ -139,7 +139,7 @@ public class Configuration
 
 				input.close();
 			} catch (IOException e) {
-				this.portServer = 5001;
+				this.portServer = 5002;
 				this.knownHosts = new String[0];
 				this.networkInterface = "eth0";
 				this.logPath = "/usr/local/gReg/log";

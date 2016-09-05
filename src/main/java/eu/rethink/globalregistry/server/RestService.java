@@ -69,7 +69,10 @@ public class RestService {
  		+ "build: " + Configuration.getInstance().getVersionNumber()
  		+ "connectedNodes: " + connectedNodes;
  		
- 		JSONObject response = (new ResponseBuilder()).code(200).description("OK").value(value).build();
+ 		JSONObject response = new JSONObject();
+ 		response.put("Code", 200);
+ 		response.put("Description", "OK");
+ 		response.put("Value", value);
  		
 		return response.toString();
 	}
@@ -83,8 +86,10 @@ public class RestService {
 		// TODO verify format of GlobalID
 		
 		//JSONObject jsonResponse = new JSONObject(ResponseFactory.createDataNotFoundResponse());
-		ResponseBuilder rb = new ResponseBuilder();
-		rb.code(404).description("GUID not found").value("");
+		JSONObject response = new JSONObject();
+ 		response.put("Code", 404);
+ 		response.put("Description", "GUID not found");
+ 		response.put("Value", "");
 		
 		if(guid != null)
 		{
@@ -122,7 +127,9 @@ public class RestService {
 						Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);
 						LOGGER.info("token verified");
 						
-						rb.code(200).description("OK").value(jwt);
+						response.put("Code", 200);
+				 		response.put("Description", "OK");
+				 		response.put("Value", jwt);
 					}
 					catch (JSONException | DatasetIntegrityException e)
 					{
@@ -144,7 +151,7 @@ public class RestService {
 			}
 		}
 		// respond with data from TomP2P
-		return rb.build().toString();
+		return response.toString();
 	}
 
 	/**
@@ -165,7 +172,7 @@ public class RestService {
 		JSONObject existingData; // the already existing version (if there is any)
 		PublicKey publicKey; // the public key of the NEW version
 		AccessManager accessManager = new AccessManager();
-		ResponseBuilder rb = new ResponseBuilder();
+		JSONObject response = new JSONObject();
 		
 		try
 		{
@@ -214,8 +221,7 @@ public class RestService {
 			{
 				// updating an existing dataset
 				
-				JSONObject jwtPayloadFromDHT = new JSONObject(
-						new String(Base64UrlCodec.BASE64URL.decodeToString(dhtResult.split("\\.")[1])));
+				JSONObject jwtPayloadFromDHT = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(dhtResult.split("\\.")[1])));
 				
 				existingData = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayloadFromDHT.get("data").toString()));
 				
@@ -269,10 +275,12 @@ public class RestService {
 				
 				LOGGER.info("Dataset for [" + guid + "] updated: \n" + jwt);
 				
-				rb.code(200).description("OK").value("");
+				response.put("Code", 200);
+		 		response.put("Description", "OK");
+		 		response.put("Value", "");
 				
 				//JSONObject jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
-				return rb.build().toString();
+				return response.toString();
 			}
 			else
 			{
@@ -287,8 +295,11 @@ public class RestService {
 				// saving the new dataset in the db
 				new AccessManager().insertUserDataset(guid, jwt);
 				
-				rb.code(200).description("OK").value("");
-				return rb.build().toString();
+				response.put("Code", 200);
+		 		response.put("Description", "OK");
+		 		response.put("Value", "");
+		 		
+				return response.toString();
 				
 				//JSONObject jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
 				//return jsonResponse.toString();
@@ -308,15 +319,19 @@ public class RestService {
 			//JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
 			//return jsonResponse.toString();
 			
-			rb.code(400).description("Invalid request").value("");
-			return rb.build().toString();
+			response.put("Code", 400);
+	 		response.put("Description", "Invalid request");
+	 		response.put("Value", "");
+			return response.toString();
 		}
 		catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException | ClassNotFoundException | IOException e)
 		{
 			LOGGER.error("Error while putting data into DHT: " + ExceptionUtils.getStackTrace(e) + "\n" + e);
 			
-			rb.code(400).description("Invalid request").value("");
-			return rb.build().toString();
+			response.put("Code", 400);
+	 		response.put("Description", "Invalid request");
+	 		response.put("Value", "");
+			return response.toString();
 			
 			//JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
 			//return jsonResponse.toString();
@@ -324,8 +339,10 @@ public class RestService {
 		catch (Exception e)
 		{
 			// TODO Auto-generated catch block
-			rb.code(500).description("Internal error").value(e.getMessage());
-			return rb.build().toString();
+			response.put("Code", 500);
+	 		response.put("Description", "Internal server error");
+	 		response.put("Value", "");
+			return response.toString();
 		}
 	}
 }
