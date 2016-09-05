@@ -155,3 +155,10 @@ GUIDs can be created with the following algorithm:
 - get a string to be used as a salt
 - perform PKDF2 with SHA256 with 10000 iterations on the public key, using the salt
 - encode the result in Base64url. This is the GUID
+
+# Configuration
+
+    port_server=5002
+    network_interface=eth0
+    known_hosts=130.149.22.134
+    log_path=/usr/local/gReg/logs/
