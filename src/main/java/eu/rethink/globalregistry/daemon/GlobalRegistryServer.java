@@ -1,129 +1,136 @@
 package eu.rethink.globalregistry.daemon;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
+import org.joda.time.DateTime;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.rethink.globalregistry.server.JettyServer;
+import eu.rethink.globalregistry.util.XSDDateTime;
+import io.jsonwebtoken.impl.Base64UrlCodec;
 import eu.rethink.globalregistry.configuration.Configuration;
+import eu.rethink.globalregistry.dao.AccessManager;
 import eu.rethink.globalregistry.dht.DHTManager;
+import eu.rethink.globalregistry.model.UsersDataset;
 
 /**
  * Main class of the GlobalRegistryDaemon.
  *
  */
-public class GlobalRegistryServer implements Daemon
-{
-	private static Logger	LOGGER;
+public class GlobalRegistryServer implements Daemon {
+	private static Logger LOGGER;
 
-	public static void main(String[] args)
-	{
-		// init SONIC, configure
-		Options options = new Options();
+	public static void main(String[] args) {
 
-		OptionBuilder.withLongOpt("help");
-		OptionBuilder.withDescription("displays help on cli parameters");
-		Option helpOption = OptionBuilder.create("h");
+		String configFile = Configuration.getInstance().getConfigFilename();
+		Configuration.getInstance().loadConfigurationFile(configFile);
+		// setup logging
+		System.setProperty("loginfofile", Configuration.getInstance().getLogPath() + "log-info.log");
+		System.setProperty("logdebugfile", Configuration.getInstance().getLogPath() + "log-debug.log");
+		LOGGER = LoggerFactory.getLogger(GlobalRegistryServer.class);
 
-		OptionBuilder.withLongOpt("cfg");
-		OptionBuilder
-				.withDescription("required: give the path to the folder that contains greg.config");
-		//OptionBuilder.isRequired();
-		OptionBuilder.hasArg();
-		Option cfgOption = OptionBuilder.create("c");
-
-		options.addOption(helpOption);
-		options.addOption(cfgOption);
-		
-		// parse comman line parameters
-		CommandLineParser parser = new BasicParser();
-		
-		try
-		{
-			CommandLine cmd = parser.parse(options, args);
-			if (cmd.hasOption("h"))
-			{
-				HelpFormatter formater = new HelpFormatter();
-				formater.printHelp("gRegs help", options);
-				System.exit(0);
-			}
-			
-			String configFile;
-			
-			if(cmd.hasOption("c"))
-			{
-				System.out.println(cmd.getOptionValue("c"));
-				configFile = cmd.getOptionValue("c");
-			}
-			else
-			{
-				configFile = Configuration.getInstance().getConfigFilename();
-			}
-				
-			System.out.println("Initializing SONIC - loading gsls.config");
-			String pathToConfig = configFile;
-			String fullPathToConfig = pathToConfig + File.separator + "greg.config";
-			//String fullPathToConfig = pathToConfig;
-			System.out.println("Trying to load config file: " + fullPathToConfig);
-			
-			if(!Configuration.propFileExists(fullPathToConfig))
-			{
-				System.out.println("No configuration file found. Please create valid gsls.config and provide path to it via command line option -c.");
-				System.exit(0);
-			}
-			
-			Configuration.getInstance().loadConfigurationFile();
-			// setup logging
-			System.setProperty("loginfofile", Configuration.getInstance().getLogPath() + "log-info.log");
-			System.setProperty("logdebugfile", Configuration.getInstance().getLogPath() + "log-debug.log");
-			LOGGER = LoggerFactory.getLogger(GlobalRegistryServer.class);
-
-			LOGGER.info(Configuration.getInstance().getProductName() + " "
-					+ Configuration.getInstance().getVersionName() + " "
-					+ Configuration.getInstance().getVersionCode());
-			LOGGER.info("Build #" + Configuration.getInstance().getVersionNumber() + " ("
-					+ Configuration.getInstance().getVersionDate() + ")\n");
-		}
-		catch (ParseException e1)
-		{
-			System.out.println("Wrong parameter. Error: " + e1.getMessage());
-		}
+		LOGGER.info(Configuration.getInstance().getProductName() + " " + Configuration.getInstance().getVersionName()
+				+ " " + Configuration.getInstance().getVersionCode());
+		LOGGER.info("Build #" + Configuration.getInstance().getVersionNumber() + " ("
+				+ Configuration.getInstance().getVersionDate() + ")\n");
 
 		// init dht
 		LOGGER.info("initializing DHT... ");
-		try
-		{
+		try {
 			DHTManager.getInstance().initDHT();
 			LOGGER.info("DHT initialized successfully");
 
+			// put dataset
+			if (Configuration.getInstance().getStartDatabase() == 1) {
+
+				ArrayList<UsersDataset> UsersDatasetList = new AccessManager().getUsersDataset();
+				Iterator<UsersDataset> list = UsersDatasetList.iterator();
+				String guid;
+				String jwt;
+				while (list.hasNext()) {
+					UsersDataset UsersDataset = list.next();
+
+					guid = UsersDataset.getGuid();
+					jwt = UsersDataset.getJwt();
+
+					String dhtResult = DHTManager.getInstance().get(guid);
+
+					if (dhtResult != null) {
+
+						JSONObject jwtPayloadFromDHT = new JSONObject(
+								new String(Base64UrlCodec.BASE64URL.decodeToString(dhtResult.split("\\.")[1])));
+
+						JSONObject existingData = new JSONObject(
+								Base64UrlCodec.BASE64URL.decodeToString(jwtPayloadFromDHT.get("data").toString()));
+
+						// step by step:
+						JSONObject jwtPayload = new JSONObject(
+								new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[1])));
+						LOGGER.info("payload: " + jwtPayload.toString());
+
+						// the data claim is a base64url-encoded json object
+						JSONObject data = new JSONObject(
+								Base64UrlCodec.BASE64URL.decodeToString(jwtPayload.get("data").toString()));
+
+						// get the Last update time and the Time out to compare
+						// them
+						DateTime dataLastupdate = XSDDateTime.parseXSDDateTime(data.getString("lastUpdate"));
+						DateTime existingDataLastupdate = XSDDateTime
+								.parseXSDDateTime(existingData.getString("lastUpdate"));
+						DateTime dataTimeout = XSDDateTime.parseXSDDateTime(data.getString("timeout"));
+						DateTime existingDataTimeout = XSDDateTime.parseXSDDateTime(existingData.getString("timeout"));
+
+						// see if Data set has a new version than the one in the
+						// rang
+						if (dataLastupdate.compareTo(existingDataLastupdate) == 1
+								|| dataTimeout.compareTo(existingDataTimeout) == 1) {
+
+							// if yes we write the JWT to the DHT
+							DHTManager.getInstance().put(guid, jwt);
+
+							// check if the Data set is a old version than the
+							// one in
+							// the rang
+						} else if (dataLastupdate.compareTo(existingDataLastupdate) == -1
+								|| dataTimeout.compareTo(existingDataTimeout) == -1) {
+
+							// if yes delete it from the db because its old
+							// version
+							new AccessManager().deleteUserDataset(guid);
+
+						}
+
+					} else {
+						// in this case, there is no dataset for this GUID in
+						// the DHT so we write the JWT to the DHT
+						DHTManager.getInstance().put(guid, jwt);
+					}
+				}
+			}
 			// init GlobalRegistry server
 			LOGGER.info("initializing Global Registry server... ");
-
+			// JettyServer.start();
 			JettyServer.start();
 
-		}
-		catch (Exception e)
+		} catch (
+
+		Exception e)
+
 		{
 			LOGGER.info("failed!");
 			e.printStackTrace();
 		}
+
 	}
 
 	@Override
-	public void init(DaemonContext arg0) throws DaemonInitException, Exception
-	{
+	public void init(DaemonContext arg0) throws DaemonInitException, Exception {
 		System.out.println("deamon: init()");
 		String arguments[] = arg0.getArguments();
 		System.out.println(arguments);
@@ -131,20 +138,17 @@ public class GlobalRegistryServer implements Daemon
 	}
 
 	@Override
-	public void start() throws Exception
-	{
+	public void start() throws Exception {
 		System.out.println("deamon: start()");
 	}
 
 	@Override
-	public void stop() throws Exception
-	{
+	public void stop() throws Exception {
 		System.out.println("deamon: exception()");
 	}
 
 	@Override
-	public void destroy()
-	{
+	public void destroy() {
 		System.out.println("deamon: destroy()");
 	}
 
