@@ -31,9 +31,10 @@ public class ResponseBuilder
 	 * 
 	 * @param code
 	 */
-	public void code(int code)
+	public ResponseBuilder code(int code)
 	{
 		this.Code = code;
+		return this;
 	}
 
 	/**
@@ -51,9 +52,10 @@ public class ResponseBuilder
 	 * 
 	 * @param value
 	 */
-	public void value(String value)
+	public ResponseBuilder value(String value)
 	{
 		this.Value = value;
+		return this;
 	}
 
 	/**
@@ -71,9 +73,10 @@ public class ResponseBuilder
 	 * 
 	 * @param Description
 	 */
-	public void description(String description)
+	public ResponseBuilder description(String description)
 	{
 		this.Description = Description;
+		return this;
 	}
 	
 	public JSONObject build()
