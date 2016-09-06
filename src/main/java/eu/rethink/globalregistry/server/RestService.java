@@ -66,8 +66,8 @@ public class RestService {
 		}
 		
  		String value = "version: " + Configuration.getInstance().getVersionName()
- 		+ "build: " + Configuration.getInstance().getVersionNumber()
- 		+ "connectedNodes: " + connectedNodes;
+ 		+ ", build: " + Configuration.getInstance().getVersionNumber()
+ 		+ ", connectedNodes: " + connectedNodes.toString();
  		
  		JSONObject response = new JSONObject();
  		response.put("Code", 200);
