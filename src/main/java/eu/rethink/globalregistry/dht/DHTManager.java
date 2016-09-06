@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 
+import eu.rethink.globalregistry.certification.HandshakeSetup;
 import net.tomp2p.connection.PeerConnection;
 import net.tomp2p.dht.*;
 import eu.rethink.globalregistry.configuration.Configuration;
@@ -48,52 +49,10 @@ public class DHTManager
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
 		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
 
-		// Challenge new added peers
-		peer.peerBean().peerMap().addPeerMapChangeListener(new PeerMapChangeListener() {
-			@Override
-			public void peerInserted(PeerAddress peerAddress, boolean verified) {
-				peer.peer().objectDataReply(new ObjectDataReply() {
-					@Override
-					public Object reply(PeerAddress sender, Object request) throws Exception {
-						System.out.println("[CHALLENGE] Received from: " + sender.peerId());
-						return "challenge!";
-					}
-				});
-
-				peer.send(peerAddress.peerId()).object("Hey!").requestP2PConfiguration(new RequestP2PConfiguration(1, 10, 0)).start()
-						.addListener(new BaseFutureListener<FutureSend>() {
-							@Override
-							public void operationComplete(FutureSend future) throws Exception {
-
-								for(Object object : future.rawDirectData2().values()) {
-									System.out.println("Got: " + object);
-								}
-							}
-
-							@Override
-							public void exceptionCaught(Throwable t) throws Exception {
-
-							}
-						});
-
-			}
-
-			@Override
-			public void peerRemoved(PeerAddress peerAddress, PeerStatistic storedPeerAddress) {
-				System.out.println("[PEER REMOVED] " + "Invalid challenge response from " + peerAddress.peerId());
-			}
-
-			@Override
-			public void peerUpdated(PeerAddress peerAddress, PeerStatistic storedPeerAddress) {
-
-			}
-		});
-
-		// Setup Challenge reply interface
-
-
-
 		new IndirectReplication(peer).start();
+
+		HandshakeSetup handshake = new HandshakeSetup(peer);
+		handshake.init();
 		
 		for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
 		{
