@@ -51,19 +51,24 @@ public class RestService
 	{
 		// TODO multiple requests in one?
 		LOGGER.error("GET Request without GUID received");
-		JSONObject outerJson = new JSONObject(ResponseFactory.createStatusResponse());
 		List<PeerAddress> AllNeighbors = DHTManager.getInstance().getAllNeighbors();
 		
-		JSONArray connectedNodes = new JSONArray();
- 		for(PeerAddress neighbor : AllNeighbors)
-		{
- 			connectedNodes.put(neighbor.inetAddress().getHostAddress());
+		//JSONArray connectedNodes = new JSONArray();
+		String connectedNodes = "";
+		for (PeerAddress neighbor : AllNeighbors) {
+			connectedNodes += neighbor.inetAddress().getHostAddress() + " ";
 		}
- 		outerJson.put("version", Configuration.getInstance().getVersionName());
- 		outerJson.put("build", Configuration.getInstance().getVersionNumber());
- 		outerJson.put("connectedNodes", connectedNodes);
- 		
-		return outerJson.toString();
+		
+		String message = "version: " + Configuration.getInstance().getVersionName()
+		+ ", build: " + Configuration.getInstance().getVersionNumber()
+		+ ", connectedNodes: [ " + connectedNodes + " ]";
+		
+		JSONObject response = new JSONObject();
+		response.put("Code", 200);
+		response.put("Description", "OK");
+		response.put("Value", message);
+		
+		return response.toString();
 	}
 	
 	@GET
@@ -74,7 +79,10 @@ public class RestService
 		LOGGER.info("GET Request received for GUID " + guid);
 		// TODO verify format of GlobalID
 		
-		JSONObject jsonResponse = new JSONObject(ResponseFactory.createDataNotFoundResponse());
+		JSONObject response = new JSONObject();
+		response.put("Code", 404);
+		response.put("Description", "GUID not found");
+		response.put("Value", "");
 		
 		if(guid != null)
 		{
@@ -90,8 +98,9 @@ public class RestService
 					// n/a
 					try
 					{
-						jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
-						jsonResponse.put("data", jwt);
+						response.put("Code", 200);
+				 		response.put("Description", "OK");
+				 		response.put("Value", jwt);
 					}
 					catch (JSONException e)
 					{
@@ -102,10 +111,13 @@ public class RestService
 			catch (ClassNotFoundException | IOException e)
 			{
 				LOGGER.error("Error while getting data from DHT: " + e.getMessage());
+				response.put("Code", 500);
+		 		response.put("Description", "Internal server error");
+		 		response.put("Value", "");
 			}
 		}
 		// respond with data from TomP2P
-		return jsonResponse.toString();
+		return response.toString();
 	}
 	
 	/**
@@ -126,6 +138,7 @@ public class RestService
 		String guidFromDataset; // the guid of the jwt
 		
 		PublicKey publicKey; // the public key of the NEW version
+		JSONObject response = new JSONObject();
 		
 		try
 		{
@@ -189,8 +202,11 @@ public class RestService
 				// here, everything is alright. so we write the jwt to the dht
 				DHTManager.getInstance().put(guid, jwt);
 				
-				JSONObject jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
-				return jsonResponse.toString();
+				response.put("Code", 200);
+		 		response.put("Description", "OK");
+		 		response.put("Value", "");
+		 		
+				return response.toString();
 			}
 			else
 			{
@@ -202,30 +218,39 @@ public class RestService
 				
 				DHTManager.getInstance().put(guid, jwt);
 				
-				JSONObject jsonResponse = new JSONObject(ResponseFactory.createOKResponse());
-				return jsonResponse.toString();
+				response.put("Code", 200);
+		 		response.put("Description", "OK");
+		 		response.put("Value", "");
+		 		
+				return response.toString();
 			}
 		}
 		catch (UnsupportedJwtException | MalformedJwtException e)
 		{
 			LOGGER.error("Malformed JWT Exception: " + e.getMessage() + "\n" + e);
 			
-			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
-			return jsonResponse.toString();
+			response.put("Code", 400);
+	 		response.put("Description", "Invalid request");
+	 		response.put("Value", "");
+			return response.toString();
 		}
 		catch (IntegrityException | DatasetIntegrityException e)
 		{
 			LOGGER.error("Integrity Exception: " + e.getMessage() + "\n" + e);
 			
-			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
-			return jsonResponse.toString();
+			response.put("Code", 400);
+	 		response.put("Description", "Invalid request");
+	 		response.put("Value", "");
+			return response.toString();
 		}
 		catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException | ClassNotFoundException | IOException e)
 		{
 			LOGGER.error("Error while putting data into DHT: " + e.getMessage() + "\n" + e);
 			
-			JSONObject jsonResponse = new JSONObject(ResponseFactory.createInvalidRequestResponse());
-			return jsonResponse.toString();
+			response.put("Code", 500);
+	 		response.put("Description", "Internal server error");
+	 		response.put("Value", "");
+			return response.toString();
 		}
 	}
 }

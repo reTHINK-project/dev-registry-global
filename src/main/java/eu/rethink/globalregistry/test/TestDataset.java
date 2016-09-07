@@ -55,7 +55,7 @@ public class TestDataset
 			json.put("guid", GUID.createGUID(publicKeyString, salt));
 			
 			System.out.println("ok");
-			System.out.println("\n  [ JSON: " + json.toString() + " ]\n");
+			System.out.println("\n  [ JSON: " + json.toString() + "]\n");
 			
 			//////////////////////////////////////////////////
 			

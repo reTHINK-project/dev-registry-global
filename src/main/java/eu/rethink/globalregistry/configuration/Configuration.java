@@ -13,10 +13,10 @@ public class Configuration
 	private Properties				prop;
 	
 	// fixed info
-	private static final String		versionName			= "0.1.1a";
-	private static final int		versionNumber		= 1235;
-	private static final String		versionCode			= "phase1";
-	private static final String		versionDate			= "2016-01-20";
+	private static final String		versionName			= "0.2.0";
+	private static final int		versionNumber		= 1257;
+	private static final String		versionCode			= "";
+	private static final String		versionDate			= "2016-09-07";
 	private static final String		productName			= "reTHINK Global Registry";
 	private static final String		productNameShort	= "gReg";
 	private static String			filename			= "greg.config";
@@ -26,7 +26,6 @@ public class Configuration
 	private int						portServer;
 	private String[]				knownHosts;
 	private String					networkInterface;
-	private int						newDHTSystem;
 	private String					logPath;
 	
 	// private Scanner scan;
@@ -49,7 +48,7 @@ public class Configuration
 	
 	public int getPortDHT()
 	{
-		return this.portDHT;
+		return 5001;
 	}
 	
 	public int getPortServer()
@@ -65,11 +64,6 @@ public class Configuration
 	public String getNetworkInterface()
 	{
 		return this.networkInterface;
-	}
-	
-	public int getNewDHTSystem()
-	{
-		return this.newDHTSystem;
 	}
 	
 	public String getLogPath()
@@ -106,12 +100,11 @@ public class Configuration
 			
 			prop.load(input);
 			
-			this.portDHT = Integer.parseInt(prop.getProperty("port_dht"));
+			this.portDHT = 5001;
 			this.portServer = Integer.parseInt(prop.getProperty("port_server"));
 			String hosts = prop.getProperty("known_hosts");
 			this.knownHosts = hosts.split(";");
 			this.networkInterface = prop.getProperty("network_interface");
-			this.newDHTSystem = Integer.parseInt(prop.getProperty("new_dht_system"));
 			this.setLogPath(prop.getProperty("log_path"));
 			
 			input.close();
@@ -120,11 +113,10 @@ public class Configuration
 		{
 			// file does not exist. using default hardcoded values
 			
-			this.portDHT = 5002;
-			this.portServer = 5001;
+			this.portDHT = 5001;
+			this.portServer = 5002;
 			this.knownHosts = new String[0];
 			this.networkInterface = "eth0";
-			this.newDHTSystem = 1;
 			this.logPath = "/usr/local/gReg/log";
 			
 			//e.printStackTrace();
