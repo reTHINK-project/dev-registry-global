@@ -1,6 +1,9 @@
 # dev-registry-global
 Global Registry
 
+!!! WARNING !!!
+default branch is now `tmp_master`
+
 ## Changelog
 
 ### 0.2.0
