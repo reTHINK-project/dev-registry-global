@@ -7,46 +7,48 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Configuration
-{
+public class Configuration {
 	private static Configuration instance = null;
-	
+
 	private Properties prop;
-	
+
 	// fixed info
-	private static final String versionName = "0.2.0a";
-	private static final int versionNumber = 1241;
-	private static final String versionCode = "";
-	private static final String versionDate = "2016-09-06";
+	private static final String versionName = "0.1.1a";
+	private static final int versionNumber = 1235;
+	private static final String versionCode = "phase1";
+	private static final String versionDate = "2016-01-20";
 	private static final String productName = "reTHINK Global Registry";
 	private static final String productNameShort = "gReg";
 	private static String filename = "greg.config";
-	
+
+
 	// cvars
+
 	private int portServer;
 	private String[] knownHosts;
 	private String networkInterface;
 	private String logPath;
 	
+
 	//Database config
-	private  int db_backup = 0;
+	private  int db_backup = 1 ;
 	private  String db_database = "globalregistry";
 	private  String db_table = "dataset";
 	private  String db_user = "root";
 	private  String db_pass = "";
 	
 	// private Scanner scan;
+
 	private Configuration() {
 		prop = new Properties();
 	}
-	
-	public static Configuration getInstance()
-	{
+
+	public static Configuration getInstance() {
 		if (instance == null)
 			instance = new Configuration();
 		return instance;
 	}
-	
+
 	// /////////////////////////////////////////////////////////////////////////////////////////////
 	// cvar getters
 	// /////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +117,7 @@ public class Configuration
 			this.portServer = 5001;
 			this.knownHosts = new String[0];
 			this.networkInterface = "eth0";
-			this.logPath = "/usr/local/gReg/logs";
+			this.logPath = "/usr/local/gReg/log";
 			
 		} else {
 
@@ -142,7 +144,7 @@ public class Configuration
 				this.portServer = 5001;
 				this.knownHosts = new String[0];
 				this.networkInterface = "eth0";
-				this.logPath = "/usr/local/gReg/logs";
+				this.logPath = "/usr/local/gReg/log";
 			}
 		}
 

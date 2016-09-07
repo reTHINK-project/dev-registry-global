@@ -45,7 +45,9 @@ public class DHTManager
 		Bindings bind = new Bindings();
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
 		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
-		new IndirectReplication(peer).start();	
+		
+		new IndirectReplication(peer).start();
+		
 		for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
 		{
 			InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);
