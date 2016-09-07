@@ -8,6 +8,7 @@ default branch is now `tmp_master`
 
 ### 0.2.0
 
+- changed/updated configuration file handling. see example in this document
 - fixed message format
 
 ### 0.1.1a
