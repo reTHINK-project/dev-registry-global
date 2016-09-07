@@ -3,6 +3,10 @@ Global Registry
 
 ## Changelog
 
+### 0.2.0
+
+- fixed message format
+
 ### 0.1.1a
 
 - fixed a bug with the PUT interface
@@ -150,3 +154,17 @@ GUIDs can be created with the following algorithm:
 - get a string to be used as a salt
 - perform PKDF2 with SHA256 with 10000 iterations on the public key, using the salt
 - encode the result in Base64url. This is the GUID
+
+## config
+
+# port for the REST interface of GReg
+port_server=5002
+
+# list of known hosts running a greg daemon. MUST be a valid and running host
+known_hosts=130.149.22.133
+
+# network interface to use
+network_interface=eth0
+
+# path for the log files
+log_path=/usr/local/gReg/logs
