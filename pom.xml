@@ -118,9 +118,9 @@
 		</dependency>
 		<dependency>
 			<groupId>net.tomp2p</groupId>
-			 <artifactId>tomp2p-all</artifactId>
-             <version>5.0-Beta8</version>
-            <scope>compile</scope>
+			<artifactId>tomp2p-all</artifactId>
+			<version>5.0-Beta8</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -196,6 +196,11 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.54</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
 		</dependency>
 	</dependencies>
 
