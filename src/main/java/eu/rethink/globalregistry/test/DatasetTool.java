@@ -10,12 +10,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.impl.Base64UrlCodec;
 
-import java.io.Console;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
@@ -42,6 +38,7 @@ public class DatasetTool
 	
 	private static void printHelp()
 	{
+		System.out.print("----------\nv 0.0.2\n----------\n");
 		System.out.print("create, c:      create new dataset\n");
 		System.out.print("edit, ed:       edit dataset\n");
 		System.out.print("exit, e:        exit\n");
@@ -81,14 +78,16 @@ public class DatasetTool
 		{
 			if(command.equals("create") || command.equals("c")) 
 			{
-				JSONObject json = createNewDataset();
+				System.out.print("creating new dataset...\n\n");
 				
-				// TODO check validity
+				JSONObject json = createNewDataset();
 				
 				dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
 				privateKey = json.getString("privateKey");
 				
-				System.out.print("done\n");
+				verifyDataset();
+				
+				System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
 			}
 			
 			else if(command.equals("edit") || command.equals("ed")) 
@@ -207,77 +206,79 @@ public class DatasetTool
 			
 			else if(command.equals("upload") || command.equals("u")) 
 			{
-				System.out.print("encoding to base64URL... ");
-				
-				String encodedClaim = new String(Base64UrlCodec.BASE64URL.encode(dataset.exportJSONObject().toString()));
-				
-				System.out.println("ok");
-				System.out.println("\n  [ encoded: " + encodedClaim + " ]\n");
-				
-				//////////////////////////////////////////////////
-				
-				System.out.print("creating JWT... ");
-				String jwt = "";
-				try
+				if(dataset == null)
+					System.out.print("no dataset loaded. load from file (rf) or create one (c)");
+				else
 				{
-					jwt = Jwts.builder().claim("data", encodedClaim).signWith(SignatureAlgorithm.ES256, ECDSAKeyPairManager.decodePrivateKey(privateKey)).compact();
+					System.out.print("encoding to base64URL... ");
+					
+					String encodedClaim = new String(Base64UrlCodec.BASE64URL.encode(dataset.exportJSONObject().toString()));
+					
+					System.out.println("ok");
+					System.out.println("\n  [ encoded: " + encodedClaim + " ]\n");
+					
+					//////////////////////////////////////////////////
+					
+					System.out.print("creating JWT... ");
+					String jwt = "";
+					try
+					{
+						jwt = Jwts.builder().claim("data", encodedClaim).signWith(SignatureAlgorithm.ES256, ECDSAKeyPairManager.decodePrivateKey(privateKey)).compact();
+					}
+					catch (InvalidKeySpecException e)
+					{
+						e.printStackTrace();
+					}
+					catch (NoSuchAlgorithmException e)
+					{
+						e.printStackTrace();
+					}
+					
+					System.out.println("ok");
+					System.out.println("\n  [ jwt: " + jwt + " ]\n");
+					
+					//////////////////////////////////////////////////
+					
+					System.out.print("writing JWT to GlobalRegistry ... ");
+					
+					GlobalRegistryAPI.putData(nodes[primarynode], dataset.getGUID(), jwt);
+					
+					System.out.println("ok");
 				}
-				catch (InvalidKeySpecException e)
-				{
-					e.printStackTrace();
-				}
-				catch (NoSuchAlgorithmException e)
-				{
-					e.printStackTrace();
-				}
-				
-				System.out.println("ok");
-				System.out.println("\n  [ jwt: " + jwt + " ]\n");
-				
-				//////////////////////////////////////////////////
-				
-				System.out.print("writing JWT to GlobalRegistry ... ");
-				
-				GlobalRegistryAPI.putData(nodes[primarynode], dataset.getGUID(), jwt);
-				
-				System.out.println("ok");
 			}
 			
 			else if(command.equals("verify") || command.equals("v")) 
 			{
-				System.out.print("verifying values of dataset ... ");
-				
-				try
-				{
-					dataset.checkDatasetValidity(dataset.exportJSONObject());
-					System.out.print("ok!\n");
-				}
-				catch (DatasetIntegrityException e)
-				{
-					System.out.print("invalid!\n");
-					e.printStackTrace();
-				}
+				if(dataset == null)
+					System.out.print("no dataset loaded. load from file (rf) or create one (c)");
+				else
+					verifyDataset();
 			}
 			
 			else if(command.equals("writefile") || command.equals("wf"))
 			{
-				System.out.print("writing to file " + dataset.getGUID() + ".json ...");
-				
-				try
+				if(dataset == null)
+					System.out.print("no dataset loaded. load from file (rf) or create one (c)");
+				else
 				{
-					JSONObject jsonDataset = dataset.exportJSONObject();
-					JSONObject jsonDatasetWithPrivateKey = new JSONObject();
-					jsonDatasetWithPrivateKey.put("dataset", jsonDataset);
-					jsonDatasetWithPrivateKey.put("privateKey", privateKey);
+					System.out.print("writing to file " + dataset.getGUID() + ".json ...");
 					
-					File file = new File(dataset.getGUID() + ".json");
-					FileUtils.writeStringToFile(file, jsonDatasetWithPrivateKey.toString(), "UTF-8", false);
-					
-					System.out.print("export successful!\n");
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
+					try
+					{
+						JSONObject jsonDataset = dataset.exportJSONObject();
+						JSONObject jsonDatasetWithPrivateKey = new JSONObject();
+						jsonDatasetWithPrivateKey.put("dataset", jsonDataset);
+						jsonDatasetWithPrivateKey.put("privateKey", privateKey);
+						
+						File file = new File(dataset.getGUID() + ".json");
+						FileUtils.writeStringToFile(file, jsonDatasetWithPrivateKey.toString(), "UTF-8", false);
+						
+						System.out.print("export successful!\n");
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 			
@@ -430,6 +431,22 @@ public class DatasetTool
 			e.printStackTrace();
 			System.exit(1);
 			return null;
+		}
+	}
+	
+	private static void verifyDataset()
+	{
+		System.out.print("verifying values of dataset ... ");
+		
+		try
+		{
+			dataset.checkDatasetValidity(dataset.exportJSONObject());
+			System.out.print("ok!\n");
+		}
+		catch (DatasetIntegrityException e)
+		{
+			System.out.print("invalid!\n");
+			e.printStackTrace();
 		}
 	}
 	
