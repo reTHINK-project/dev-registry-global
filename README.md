@@ -6,6 +6,12 @@ default branch is now `tmp_master`
 
 ## Changelog
 
+### 0.2.1
+
+- added DatasetTool to test GReg functionality and status (test/DatasetTool.java)
+- more detailed implementation of Dataset class
+- some small fixes and code additions
+
 ### 0.2.0
 
 - changed/updated configuration file handling. see example in this document
