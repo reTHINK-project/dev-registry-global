@@ -167,14 +167,22 @@ GUIDs can be created with the following algorithm:
 
 ## config
 
-# port for the REST interface of GReg
+#### port for the REST interface of GReg
 port_server=5002
 
-# list of known hosts running a greg daemon. MUST be a valid and running host
+#### list of known hosts running a greg daemon. MUST be a valid and running host
 known_hosts=130.149.22.133
 
-# network interface to use
+#### network interface to use
 network_interface=eth0
 
-# path for the log files
+#### path for the log files
 log_path=/usr/local/gReg/logs
+
+## DatasetTool
+
+### How to run
+
+- In the Eclipse project, simply run test/DatasetTool.java
+- Use textual commands to create, edit, upload, resolve, verify, print, datasets. use command "h" for a full list of commands
+- Sample is available in the Wiki: https://github.com/reTHINK-project/dev-registry-global/wiki/DatasetTool
