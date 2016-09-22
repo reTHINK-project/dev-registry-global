@@ -78,21 +78,40 @@ public class DatasetTool
 		{
 			if(command.equals("create") || command.equals("c")) 
 			{
-				System.out.print("creating new dataset...\n\n");
+				String inOverwriteDataset = "y";
 				
-				JSONObject json = createNewDataset();
+				if(dataset != null)
+				{
+					System.out.print("overwrite current dataset in memory? (y|n) [n]: \n");
+					inOverwriteDataset = in.nextLine();
+				}
 				
-				dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
-				privateKey = json.getString("privateKey");
-				
-				verifyDataset();
-				
-				System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
+				if(!inOverwriteDataset.equals("n") && !inOverwriteDataset.equals("y"))
+				{
+					System.out.print("illegal parameter!\n");
+				}
+				else if(inOverwriteDataset.equals("n"))
+				{
+					System.out.print("oborting...\n");
+				}
+				else
+				{
+					System.out.print("creating new dataset ...\n");
+					
+					JSONObject json = createNewDataset();
+					
+					dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
+					privateKey = json.getString("privateKey");
+					
+					verifyDataset();
+					
+					System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
+				}
 			}
 			
 			else if(command.equals("edit") || command.equals("ed")) 
 			{
-				System.out.print("feature nor implemented yet\n");
+				editDataset();
 			}
 			
 			else if(command.equals("help") || command.equals("h"))
@@ -110,7 +129,7 @@ public class DatasetTool
 			
 			else if(command.equals("setnode") || command.equals("sn"))
 			{
-				System.out.print("specify node number (0-" + (nodes.length-1) + "):");
+				System.out.print("specify node number (0-" + (nodes.length-1) + ") [" + primarynode + "]: ");
 				int innodenumber = in.nextInt();
 				
 				if(innodenumber < 0 || innodenumber > (nodes.length-1))
@@ -296,14 +315,11 @@ public class DatasetTool
 		System.out.print("bye...\n\n");
 	}
 	
-	private static JSONObject createNewDataset()
+	private static JSONObject editDataset()
 	{
-		try
+		/*try
 		{
 			Scanner in = new Scanner(System.in);
-			System.out.print("creating new ECDSA keypair... ");
-			
-			//////////////////////////////////////////////////
 			
 			KeyPair keypair = ECDSAKeyPairManager.createKeyPair();
 			String publicKeyString = ECDSAKeyPairManager.encodePublicKey(keypair.getPublic());
@@ -413,6 +429,167 @@ public class DatasetTool
 			JSONObject jsonDataset = new JSONObject();
 			jsonDataset.put("salt", salt);
 			jsonDataset.put("userIDs", new JSONArray());
+			jsonDataset.put("lastUpdate", lastUpdate);
+			jsonDataset.put("timeout", timeout);
+			jsonDataset.put("publicKey", publicKeyString);
+			jsonDataset.put("active", active);
+			jsonDataset.put("revoked", revoked);
+			jsonDataset.put("guid", GUID.createGUID(publicKeyString, salt));
+			
+			JSONObject json = new JSONObject();
+			json.put("dataset", jsonDataset);
+			json.put("privateKey", privateKeyString);
+			
+			return json;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+			return null;
+		}*/
+		
+		return null;
+	}
+	
+	private static JSONObject createNewDataset()
+	{
+		try
+		{
+			Scanner in = new Scanner(System.in);
+			System.out.print("creating new ECDSA keypair... ");
+			
+			//////////////////////////////////////////////////
+			
+			KeyPair keypair = ECDSAKeyPairManager.createKeyPair();
+			String publicKeyString = ECDSAKeyPairManager.encodePublicKey(keypair.getPublic());
+			String privateKeyString = ECDSAKeyPairManager.encodePrivateKey(keypair.getPrivate());
+			
+			privateKey = privateKeyString;
+			
+			System.out.println("ok\n");
+			
+			//////////////////////////////////////////////////
+			
+			SecureRandom random = new SecureRandom();
+			String salt = new BigInteger(80, random).toString(32);
+			
+			System.out.print("specify salt (26 char length) [" + salt + "]: ");
+			String insalt = in.nextLine();
+			
+			if(!insalt.equals(""))
+			{
+				// TODO check format
+				salt = insalt;
+			}
+			
+			System.out.println("> " + salt);
+			
+			//////////////////////////////////////////////////
+			
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date());
+			
+			String lastUpdate = XSDDateTime.exportXSDDateTime(c.getTime());
+			
+			c.add(Calendar.DATE, 90);
+			
+			String timeout = XSDDateTime.exportXSDDateTime(c.getTime());
+			
+			System.out.print("specify specify timeout (XSDDateTime) [" + timeout + "]: ");
+			String inTimeout = in.nextLine();
+			
+			if(!inTimeout.equals(""))
+			{
+				try
+				{
+					XSDDateTime.parseXSDDateTime(inTimeout);
+				}
+				catch(Exception e)
+				{
+					System.out.print("invalid value. using 90 days from now (" + timeout + ")\n");
+					timeout = inTimeout;
+				}
+			}
+			
+			System.out.println("> " + timeout);
+			
+			//////////////////////////////////////////////////
+			
+			int active = 1;
+			int inActive;
+			
+			System.out.print("specify specify active (0|1) [" + active + "]: ");
+			
+			try
+			{
+				inActive = Integer.parseInt(in.nextLine());
+			}
+			catch(NumberFormatException e)
+			{
+				inActive = 1;
+			}
+			
+			if(inActive != 0 && inActive != 1)
+			{
+				System.out.print("invalid value. using default (1)\n");
+				active = 1;
+			}
+			
+			System.out.println("> " + active);
+			
+			//////////////////////////////////////////////////
+			
+			int revoked = 0;
+			int inRevoked;
+			
+			System.out.print("specify specify revoked (0|1) [" + revoked + "]: ");
+			
+			try
+			{
+				inRevoked = Integer.parseInt(in.nextLine());
+			}
+			catch(NumberFormatException e)
+			{
+				inRevoked = 1;
+			}
+			
+			if(inRevoked != 0 && inRevoked != 1)
+			{
+				System.out.print("invalid value. using default (0)\n");
+				revoked = 0;
+			}
+			
+			System.out.println("> " + revoked);
+			
+			//////////////////////////////////////////////////
+			
+			JSONArray userIDs = new JSONArray();
+			
+			System.out.print("add UserID? (y|n) [n]: \n");
+			String inAddUserID = in.nextLine();
+			
+			while(inAddUserID.equals("y"))
+			{
+				System.out.print("specify userID: \n");
+				String inUserID = in.nextLine();
+				
+				// TODO implement format check
+				
+				userIDs.put(inUserID);
+				
+				System.out.print("add another UserID? (y|n) [n]: \n");
+				inAddUserID = in.nextLine();
+			}
+			
+			if(!inAddUserID.equals("n"))
+				System.out.print("illegal parameter!\n");
+			
+			System.out.print("finishing up... \n");
+			
+			JSONObject jsonDataset = new JSONObject();
+			jsonDataset.put("salt", salt);
+			jsonDataset.put("userIDs", userIDs);
 			jsonDataset.put("lastUpdate", lastUpdate);
 			jsonDataset.put("timeout", timeout);
 			jsonDataset.put("publicKey", publicKeyString);
