@@ -200,7 +200,30 @@ public class DatasetTool
 			
 			else if(command.equals("readfile") || command.equals("rf")) 
 			{
-				System.out.print("specify guid to read from file:");
+				try
+				{
+					System.out.print("specify guid to read from file:");
+					String inFilename = in.nextLine();
+					
+					JSONObject json = readDatasetFile(inFilename);
+					
+					dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
+					privateKey = json.getString("privateKey");
+					
+					System.out.print("contents: " + json.getJSONObject("dataset").toString() + "\n");
+				}
+				catch (JSONException e)
+				{
+					System.out.print("error parsing file\n");
+					e.printStackTrace();
+				}
+				catch (Exception e)
+				{
+					System.out.print("error parsing file\n");
+					e.printStackTrace();
+				}
+				
+				/*System.out.print("specify guid to read from file:");
 				String infilename = in.nextLine();
 				
 				try
@@ -224,7 +247,7 @@ public class DatasetTool
 				catch (Exception e)
 				{
 					e.printStackTrace();
-				}
+				}*/
 			}
 			
 			else if(command.equals("status") || command.equals("s")) 
@@ -249,6 +272,7 @@ public class DatasetTool
 					
 					System.out.print("creating JWT... ");
 					String jwt = "";
+					
 					try
 					{
 						jwt = Jwts.builder().claim("data", encodedClaim).signWith(SignatureAlgorithm.ES256, ECDSAKeyPairManager.decodePrivateKey(privateKey)).compact();
@@ -673,6 +697,29 @@ public class DatasetTool
 	private static void printDataset()
 	{
 		System.out.print("current dataset:\n" + dataset.exportJSONObject().toString(2));
+	}
+	
+	private static JSONObject readDatasetFile(String filename)
+	{
+		JSONObject json = null;
+		
+		try
+		{
+			File file = new File(filename + ".json");
+			json = new JSONObject(FileUtils.readFileToString(file, "UTF8"));
+			
+			System.out.print("\nSuccessfully read file " + file.getName() + "\n");
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return json;
 	}
 	
 	private static void testNodes()
