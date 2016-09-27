@@ -4,15 +4,20 @@ import com.google.gson.Gson;
 import eu.rethink.globalregistry.certification.exception.InvalidCertificateException;
 import eu.rethink.globalregistry.certification.exception.X509CertificateReadException;
 import eu.rethink.globalregistry.certification.model.Message;
+import net.tomp2p.connection.PeerException;
 import net.tomp2p.dht.FutureSend;
 import net.tomp2p.dht.PeerDHT;
+import net.tomp2p.futures.BaseFuture;
 import net.tomp2p.futures.BaseFutureListener;
+import net.tomp2p.futures.FutureDirect;
+import net.tomp2p.message.Buffer;
 import net.tomp2p.p2p.RequestP2PConfiguration;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.peers.PeerMapChangeListener;
 import net.tomp2p.peers.PeerStatistic;
 import net.tomp2p.rpc.ObjectDataReply;
+import net.tomp2p.rpc.RawDataReply;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -31,7 +36,7 @@ public class HandshakeSetup {
         this.peer = peer;
         this.GSON = new Gson();
         this.x509Reader = new X509Reader();
-        this.certificateValidation = new X509Validation();
+        this.certificateValidation = new X509Validation(x509Reader);
     }
 
     public void init() {
@@ -40,14 +45,16 @@ public class HandshakeSetup {
         peer.peer().objectDataReply(new ObjectDataReply() {
             @Override
             public Object reply(PeerAddress sender, Object request) throws Exception {
+                System.out.println("[DIRECT-MESSAGE][REPLY HANDLER] RECEIVED MESSAGE from: " + sender.peerId());
+                System.out.println("[DIRECT-MESSAGE][REPLY HANDLER] MESSAGE: " + (String)request);
                 Message message = GSON.fromJson((String)request, Message.class);
 
                 if(message.getType().equals(ASK_CERTIFICATE)) {
                     System.out.println("[CERTIFICATE][MESSAGE-TYPE] Received ASK_CERTIFICATE");
-                    return "OK";
+                    return sendCertificate(sender, peer.peerAddress());
                 }else if(message.getType().equals(SEND_CERTIFICATE)) {
                     System.out.println("[CERTIFICATE][MESSAGE-TYPE] Received SEND_CERTIFICATE");
-                    return "OK";
+                    return verifyCertificate(sender, message);
                 }
 
                 return "NOT_OK";
@@ -58,13 +65,15 @@ public class HandshakeSetup {
         peer.peerBean().peerMap().addPeerMapChangeListener(new PeerMapChangeListener() {
             @Override
             public void peerInserted(PeerAddress peerAddress, boolean verified) {
-                System.out.println("[NEW PEER] Address: " + peerAddress.toString());
-                askCertificate(peerAddress);
+                if(peer.peerID().compareTo(peerAddress.peerId()) != 0) {
+                    System.out.println("[NEW PEER] Address: " + peerAddress.toString());
+                    askCertificate(peerAddress, peer.peerAddress());
+                }
             }
 
             @Override
             public void peerRemoved(PeerAddress peerAddress, PeerStatistic storedPeerAddress) {
-                System.out.println("[PEER REMOVED] " + "Invalid challenge response from " + peerAddress.peerId());
+                System.out.println("[PEER REMOVED]" + peerAddress.peerId());
             }
 
             @Override
@@ -75,61 +84,82 @@ public class HandshakeSetup {
     }
 
 
-    public void sendMessage(Number160 peerId, String data) {
-        peer.send(peerId).object(data)
-                .requestP2PConfiguration(new RequestP2PConfiguration(1, 10, 0)).start()
-                .addListener(new BaseFutureListener<FutureSend>() {
-                    @Override
-                    public void operationComplete(FutureSend future) throws Exception {
-                        Object[] values = future.rawDirectData2().values().toArray();
+    public void sendMessage(final PeerAddress peerAddress, String data) {
+        FutureDirect futureDirect = peer.peer().sendDirect(peerAddress).object(data).start();
 
-                        if(values.length == 1) {
-                            System.out.println("[CERTIFICATE][RESPONSE] " + values[0]);
-                        }
+        futureDirect.addListener(new BaseFutureListener<FutureDirect>() {
+            @Override
+            public void operationComplete(FutureDirect future) throws Exception {
+                System.out.println("[DIRECT-MESSAGE] MESSAGE SENT SUCCESSFULLY TO PEER " + peerAddress.peerId());
 
-                        System.out.println("RECEIVED REPLY.");
+                if(future.isSuccess()) {
+                    System.out.println("[DIRECT-MESSAGE][RESPONSE] " + future.object());
+
+                    Message message = GSON.fromJson((String)future.object(), Message.class);
+
+                    if(message.getType().equals(SEND_CERTIFICATE)) {
+                        System.out.println("[CERTIFICATE][MESSAGE-TYPE] Received SEND_CERTIFICATE");
+                        verifyCertificate(peerAddress, message);
                     }
 
-                    @Override
-                    public void exceptionCaught(Throwable t) throws Exception {
+                } else {
+                    System.out.println("[DIRECT-MESSAGE][RESPONSE] FUTURE NOT SUCCEDED");
+                }
+            }
 
-                    }
-                });
+            @Override
+            public void exceptionCaught(Throwable t) throws Exception {
+
+            }
+        });
 
     }
 
-    public void askCertificate(PeerAddress peerAddress) {
+    public void askCertificate(PeerAddress destination, PeerAddress source) {
 
         Message message = new Message();
 
-        message.setNode(peerAddress.peerId().toString());
+        message.setDestination(destination.peerId().toString());
+        message.setNode(source.peerId().toString());
         message.setType(ASK_CERTIFICATE);
 
-        sendMessage(peerAddress.peerId(), GSON.toJson(message));
+        sendMessage(destination, GSON.toJson(message));
     }
 
-    public void sendCertificate(PeerAddress peerAddress) throws InvalidCertificateException {
+    public String sendCertificate(PeerAddress destination, PeerAddress source) throws InvalidCertificateException {
 
         Message message = new Message();
 
-        message.setNode(peerAddress.peerId().toString());
+        message.setNode(source.peerId().toString());
         message.setType(SEND_CERTIFICATE);
+        message.setDestination(destination.peerId().toString());
 
         try {
             X509Certificate certificate = x509Reader.readFromFile(peer.peerID().toString());
             message.setData(certificate.getEncoded());
 
-            sendMessage(peerAddress.peerId(), GSON.toJson(message));
+            return GSON.toJson(message);
         } catch (CertificateEncodingException e) {
+            System.out.println("[SEND-CERTIFICATE] Error encoding certificate in message.");
             throw new InvalidCertificateException("Error encoding certificate in message.");
         } catch (X509CertificateReadException e) {
-            throw new InvalidCertificateException("Invalid certificated.");
+            System.out.println("[SEND-CERTIFICATE] Invalid certificate: " + e.getMessage());
+            throw new InvalidCertificateException("Invalid certificate: " + e.getMessage());
         }
 
     }
 
-    public void verifyCertificate(PeerAddress peerAddress, Message message) {
+    public String verifyCertificate(PeerAddress peerAddress, Message message) {
 
-        certificateValidation.validate(peerAddress, message);
+        if(!certificateValidation.validate(peerAddress, message)) {
+            PeerException cause = new PeerException(PeerException.AbortCause.USER_ABORT, "Invalid certificate presented.");
+            peer.peerBean().peerMap().peerFailed(peerAddress, cause);
+            System.out.println("[CERTIFICATE][PEER] Verification failed for peer " + message.getNode());
+            return "NOT_OK";
+        }
+
+        System.out.println("[CERTIFICATE][PEER] Verification successful for peer " + message.getNode());
+
+        return "OK";
     }
 }

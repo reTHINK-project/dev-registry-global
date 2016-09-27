@@ -1,4 +1,4 @@
-FROM java:8
+FROM openjdk:8
 
 # Install maven
 RUN apt-get update
@@ -8,8 +8,10 @@ WORKDIR /build
 
 # Dependencies
 ADD pom.xml /build/pom.xml
+ADD *.cert.pem /build/
 ADD node-1-config /build/node-1-config
 ADD node-2-config /build/node-2-config
+ADD rethink-ca /build/rethink-ca
 ADD docker-entrypoint.sh /
 RUN ["mvn", "dependency:resolve"]
 RUN ["mvn", "verify"]

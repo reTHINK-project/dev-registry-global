@@ -84,13 +84,13 @@ public class X509CertificateVerifier {
 
 
         //Certificate Revocation
-        try {
+        /*try {
             PKIXRevocationChecker rc = (PKIXRevocationChecker) builder.getRevocationChecker();
             rc.setOptions(EnumSet.of(PKIXRevocationChecker.Option.PREFER_CRLS));
             pkixParams.addCertPathChecker(rc);
         } catch(UnsupportedOperationException e){
             throw new InvalidCertificateException("Error revocation list");
-        }
+        }*/
 
         PKIXCertPathBuilderResult result = (PKIXCertPathBuilderResult)builder.build(pkixParams);
 

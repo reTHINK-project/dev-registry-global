@@ -1,22 +1,24 @@
 package eu.rethink.globalregistry.certification.model;
 
-import java.util.Base64;
+
+import org.apache.commons.codec.binary.Base64;
 
 public class Message {
 
     private String node;
     private String signature;
+    private String destination;
     private String data;
     private String type;
 
     public Message() {}
 
     public byte[] getData() {
-        return Base64.getDecoder().decode(data);
+        return Base64.decodeBase64(data);
     }
 
     public void setData(byte[] data) {
-        this.data = Base64.getEncoder().encodeToString(data);
+        this.data = Base64.encodeBase64String(data);
     }
 
     public String getNode() {
@@ -41,6 +43,14 @@ public class Message {
 
     public void setSignature(String signature) {
         this.signature = signature;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
 }

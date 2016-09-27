@@ -30,6 +30,7 @@ public class Configuration
 	private String[]				knownHosts;
 	private String					networkInterface;
 	private String					logPath;
+	private String                  peerId;
 
 	// private Scanner scan;
 
@@ -116,6 +117,7 @@ public class Configuration
 			this.setLogPath(prop.getProperty("log_path"));
 
 			this.newDHTSystem = Integer.parseInt(prop.getProperty("new_dht_system"));
+			this.peerId = prop.getProperty("peer_id");
 
 			input.close();
 		}
@@ -226,4 +228,9 @@ public class Configuration
 	{
 		return versionCode;
 	}
+
+	public String getPeerId() {
+		return peerId;
+	}
+
 }

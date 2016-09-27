@@ -17,7 +17,7 @@ public class X509Reader {
         PemObject pem;
 
         try {
-            PemReader pemReader = new PemReader(new InputStreamReader(new FileInputStream(id + "cert.pem")));
+            PemReader pemReader = new PemReader(new InputStreamReader(new FileInputStream(id + ".cert.pem")));
             pem = pemReader.readPemObject();
 
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");

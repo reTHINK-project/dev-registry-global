@@ -46,8 +46,9 @@ public class DHTManager
 	{
 		Random rand = new Random();
 		Bindings bind = new Bindings();
+		Number160 peerId = new Number160(Configuration.getInstance().getPeerId());
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
-		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
+		peer = new PeerBuilderDHT(new PeerBuilder(peerId).ports(Configuration.getInstance().getPortDHT()).start()).start();
 
 		new IndirectReplication(peer).start();
 
