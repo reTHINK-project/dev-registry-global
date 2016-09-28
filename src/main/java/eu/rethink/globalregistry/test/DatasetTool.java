@@ -30,15 +30,18 @@ import eu.rethink.globalregistry.util.XSDDateTime;
 
 public class DatasetTool
 {
-	protected static String[] nodes = {"130.149.22.133:5002", "130.149.22.134:5002", "130.149.22.135:5002"};
-	protected static int primarynode = 0;
+	public static int GREG_PORT = 5002;
+	
+	protected static JSONArray nodes = new JSONArray();
+	protected static final String defaultNode = "130.149.22.133";
+	protected static String activeNode = "130.149.22.133";
 	
 	protected static Dataset dataset;
 	protected static String privateKey;
 	
 	private static void printHelp()
 	{
-		System.out.print("----------\nv 0.0.3\n----------\n");
+		System.out.print("----------\nv 0.0.5\n----------\n");
 		System.out.print("create, c:      create new dataset\n");
 		System.out.print("edit, e:        edit dataset\n");
 		System.out.print("exit, x:        exit\n");
@@ -58,6 +61,17 @@ public class DatasetTool
 	public static void main(String args[])
 	{
 		System.out.print("ReThink GlobalRegistry Dataset Tool\n\n");
+		
+		// parse dht from default node
+		
+		System.out.println(">>> parsing dht network");
+		nodes = parseNetwork(defaultNode);
+		
+		System.out.println(">>> running status check");
+		testNodes();
+		
+		// TODO handle exception of default node not reachable
+		
 		printHelp();
 		
 //		Console c = System.console();
@@ -138,17 +152,30 @@ public class DatasetTool
 			
 			else if(command.equals("setnode") || command.equals("sn"))
 			{
-				System.out.print("specify node number (0-" + (nodes.length-1) + ") [" + primarynode + "]: ");
-				int innodenumber = in.nextInt();
+				System.out.print("specify node IP address [" + activeNode + "]: ");
+				String innode = in.nextLine();
 				
-				if(innodenumber < 0 || innodenumber > (nodes.length-1))
+				String response = GlobalRegistryAPI.getStatus(innode + ":" + GREG_PORT);
+				
+				if(response == null)
 				{
-					System.out.print("error\n");
+					System.out.print("error! node not reachable! active node set to " + activeNode + "\n");
+					activeNode = defaultNode;
 				}
 				else
 				{
-					primarynode = innodenumber;
-					System.out.print("primary node set to " + nodes[innodenumber] + "\n");
+					JSONObject jresponse = new JSONObject(response);
+					
+					if(jresponse.getInt("Code") == 200)
+					{
+						activeNode = innode;
+						System.out.print("active node set to " + activeNode + "\n");
+					}
+					else
+					{
+						System.out.print("error! node not reachable! active node set to " + activeNode + "\n");
+						activeNode = defaultNode;
+					}
 				}
 			}
 			
@@ -159,7 +186,7 @@ public class DatasetTool
 					System.out.print("specify guid to resolve:");
 					String inGUID = in.nextLine();
 					
-					JSONObject response = new JSONObject(GlobalRegistryAPI.getData(nodes[primarynode], inGUID));
+					JSONObject response = new JSONObject(GlobalRegistryAPI.getData(activeNode + ":" + GREG_PORT, inGUID));
 					String jwt = response.getString("Value");
 					
 					System.out.println("ok");
@@ -222,32 +249,6 @@ public class DatasetTool
 					System.out.print("error parsing file\n");
 					e.printStackTrace();
 				}
-				
-				/*System.out.print("specify guid to read from file:");
-				String infilename = in.nextLine();
-				
-				try
-				{
-					File file = new File(infilename + ".json");
-					JSONObject json = new JSONObject(FileUtils.readFileToString(file, "UTF8"));
-					dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
-					privateKey = json.getString("privateKey");
-					
-					System.out.print("\nSuccessfully read file " + file.getName() + "\n");
-					System.out.print("contents: " + json.getJSONObject("dataset").toString() + "\n");
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-				catch (JSONException e)
-				{
-					e.printStackTrace();
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}*/
 			}
 			
 			else if(command.equals("status") || command.equals("s")) 
@@ -293,7 +294,7 @@ public class DatasetTool
 					
 					System.out.print("writing JWT to GlobalRegistry ... ");
 					
-					GlobalRegistryAPI.putData(nodes[primarynode], dataset.getGUID(), jwt);
+					GlobalRegistryAPI.putData(activeNode + ":" + GREG_PORT, dataset.getGUID(), jwt);
 					
 					System.out.println("ok");
 				}
@@ -353,13 +354,13 @@ public class DatasetTool
 		// TODO use simple clonign maybe?
 		Dataset oldDataset = Dataset.createFromJSONObject(dataset.exportJSONObject());
 		
+		Scanner in = new Scanner(System.in);
+		
 		try
 		{
-			Scanner in = new Scanner(System.in);
-			
 			// TODO recreate keypair
 			KeyPair keypair = ECDSAKeyPairManager.createKeyPair();
-			String publicKeyString = ECDSAKeyPairManager.encodePublicKey(keypair.getPublic());
+			//String publicKeyString = ECDSAKeyPairManager.encodePublicKey(keypair.getPublic());
 			String privateKeyString = ECDSAKeyPairManager.encodePrivateKey(keypair.getPrivate());
 			
 			privateKey = privateKeyString;
@@ -460,8 +461,8 @@ public class DatasetTool
 					
 					if(inEditUserID.equals(""))
 						userIDs.put(oldUserIDs.getString(i));
-					else if(false) // TODO if format invalid
-						userIDs.put(oldUserIDs.getString(i));
+					//else if(false) // TODO if format invalid
+					//	userIDs.put(oldUserIDs.getString(i));
 					else
 						userIDs.put(inEditUserID);
 				}
@@ -469,6 +470,10 @@ public class DatasetTool
 				{
 					e.printStackTrace();
 					continue;
+				}
+				finally
+				{
+					in.close();
 				}
 			}
 			
@@ -521,9 +526,10 @@ public class DatasetTool
 	
 	private static JSONObject createNewDataset()
 	{
+		Scanner in = new Scanner(System.in);
+		
 		try
 		{
-			Scanner in = new Scanner(System.in);
 			System.out.print("creating new ECDSA keypair... ");
 			
 			//////////////////////////////////////////////////
@@ -676,6 +682,10 @@ public class DatasetTool
 			System.exit(1);
 			return null;
 		}
+		finally
+		{
+			in.close();
+		}
 	}
 	
 	private static void verifyDataset()
@@ -684,7 +694,7 @@ public class DatasetTool
 		
 		try
 		{
-			dataset.checkDatasetValidity(dataset.exportJSONObject());
+			Dataset.checkDatasetValidity(dataset.exportJSONObject());
 			System.out.print("ok!\n");
 		}
 		catch (DatasetIntegrityException e)
@@ -722,12 +732,94 @@ public class DatasetTool
 		return json;
 	}
 	
+	private static JSONArray parseNetwork(String initialNode)
+	{
+		JSONArray toCheck = new JSONArray();
+		JSONArray foundNodes = new JSONArray();
+		
+		toCheck.put(initialNode);
+		
+		while(toCheck.length() > 0)
+		{
+			//System.out.println("in array toCheck: " + toCheck.toString());
+			try
+			{
+				//System.out.println("checking: " + toCheck.getString(0));
+				//System.out.print(GlobalRegistryAPI.getStatus(toCheck.getString(0)));
+				
+				// trying the first node in toCheck
+				JSONArray connectedNodes = new JSONObject(GlobalRegistryAPI.getStatus(toCheck.getString(0) + ":" + GREG_PORT)).getJSONArray("connectedNodes");
+				
+				// as no exception was thrown, the currently checked node is online. hence adding it to foundNodes
+				foundNodes.put(toCheck.getString(0));
+				//System.out.println("adding " + toCheck.getString(0) + " to foundNodes");
+				
+				// removing currently checked node from toCheck
+				//System.out.println("removing " + toCheck.getString(0) + " from toCheck");
+				toCheck.remove(0);
+				
+				// adding all connectedNodes in response to toCheck if they are not yet in the array
+				for(int i=0; i<connectedNodes.length(); i++)
+				{
+					if(!inArray(toCheck, connectedNodes.getString(i)) && !inArray(foundNodes, connectedNodes.getString(i)))
+					{
+						//System.out.println("adding " + connectedNodes.get(i) + " to toCheck");
+						toCheck.put(connectedNodes.get(i));
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				// removing currently checked node from toCheck
+				toCheck.remove(0);
+				
+				e.printStackTrace();
+			}
+			
+			//System.out.println("in array foundNodes: " + foundNodes.toString() + "\n\n");
+		}
+		
+		return foundNodes;
+	}
+	
+	private static boolean inArray(JSONArray json, String token)
+	{
+		for(int i=0; i<json.length(); i++)
+		{
+			if(json.getString(i).equals(token))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private static String addNode()
+	{
+		try
+		{
+			Scanner in = new Scanner(System.in);
+			System.out.print("specify node ip address [" + defaultNode + "]:");
+			String inNodeAddress = in.nextLine();
+			in.close();
+			
+			// TODO verify format
+			return inNodeAddress;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return defaultNode;
+		}
+	}
+	
 	private static void testNodes()
 	{
-		for(String node: nodes)
+		for(int i=0; i<nodes.length(); i++)
 		{
-			System.out.print("Testing " + node + " ... ");
-			String response = GlobalRegistryAPI.getStatus(node);
+			System.out.print("Testing " + nodes.getString(i) + " ... ");
+			String response = GlobalRegistryAPI.getStatus(nodes.getString(i) + ":" + GREG_PORT);
 			
 			if(response == null)
 				System.out.print("FAILED!\n");
@@ -736,7 +828,8 @@ public class DatasetTool
 				JSONObject jresponse = new JSONObject(response);
 				
 				if(jresponse.getInt("Code") == 200)
-					System.out.print("OK!\n");
+					System.out.print("OK! [running version " + jresponse.getJSONObject("version").getString("version")
+							+ "#" + jresponse.getJSONObject("version").getInt("build") + "]\n");
 				else
 					System.out.print("FAILED!\n");
 			}

@@ -37,7 +37,7 @@ import net.tomp2p.peers.PeerAddress;
 /**
  * RestSerivce of GlobalRegistry.
  * 
- * @author Felix Beierle, Sebastian G�nd�r
+ * @author Felix Beierle, Sebastian Göndör
  *
  */
 @Path("/")
@@ -53,20 +53,24 @@ public class RestService
 		LOGGER.error("GET Request without GUID received");
 		List<PeerAddress> AllNeighbors = DHTManager.getInstance().getAllNeighbors();
 		
-		//JSONArray connectedNodes = new JSONArray();
-		String connectedNodes = "";
-		for (PeerAddress neighbor : AllNeighbors) {
-			connectedNodes += neighbor.inetAddress().getHostAddress() + " ";
+		JSONArray connectedNodes = new JSONArray();
+		
+		for (PeerAddress neighbor : AllNeighbors)
+		{
+			connectedNodes.put(neighbor.inetAddress().getHostAddress());
 		}
 		
-		String message = "version: " + Configuration.getInstance().getVersionName()
-		+ ", build: " + Configuration.getInstance().getVersionNumber()
-		+ ", connectedNodes: [ " + connectedNodes + " ]";
+		JSONObject version = new JSONObject();
+		version.put("version", Configuration.getInstance().getVersionName());
+		version.put("build", Configuration.getInstance().getVersionNumber());
+		
 		
 		JSONObject response = new JSONObject();
 		response.put("Code", 200);
 		response.put("Description", "OK");
-		response.put("Value", message);
+		response.put("Value", "");
+		response.put("version", version);
+		response.put("connectedNodes", connectedNodes);
 		
 		return response.toString();
 	}
@@ -214,9 +218,9 @@ public class RestService
 // writing a new dataset
 				
 				// in this case, there is no dataset for this GUID in the DHT
-				LOGGER.info("Dataset for [" + guid + "] written to DHT: \n" + jwt);
-				
 				DHTManager.getInstance().put(guid, jwt);
+				
+				LOGGER.info("Dataset for [" + guid + "] written to DHT: \n" + jwt);
 				
 				response.put("Code", 200);
 		 		response.put("Description", "OK");
