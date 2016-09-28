@@ -41,7 +41,7 @@ public class DatasetTool
 	
 	private static void printHelp()
 	{
-		System.out.print("----------\nv 0.0.5\n----------\n");
+		System.out.print("------------------------------\nv 0.0.5\n------------------------------\n");
 		System.out.print("create, c:      create new dataset\n");
 		System.out.print("edit, e:        edit dataset\n");
 		System.out.print("exit, x:        exit\n");
@@ -50,7 +50,7 @@ public class DatasetTool
 		System.out.print("quit, q:        exit\n");
 		System.out.print("readfile, rf:   read dataset from file\n");
 		System.out.print("resolve, r:     resolve guid via global registry\n");
-		System.out.print("setnode, sn:    set primary greg node to use\n");
+		System.out.print("setnode, sn:    set active greg node to use\n");
 		System.out.print("status, s:      run status check on all global registry nodes\n");
 		System.out.print("upload, u:      upload dataset to globalregistry\n");
 		System.out.print("verify, v:      verify current dataset\n");
@@ -63,11 +63,10 @@ public class DatasetTool
 		System.out.print("ReThink GlobalRegistry Dataset Tool\n\n");
 		
 		// parse dht from default node
-		
-		System.out.println(">>> parsing dht network");
+		System.out.println("parsing dht network... ");
 		nodes = parseNetwork(defaultNode);
 		
-		System.out.println(">>> running status check");
+		System.out.println("running status check... ");
 		testNodes();
 		
 		// TODO handle exception of default node not reachable
@@ -127,14 +126,15 @@ public class DatasetTool
 			
 			else if(command.equals("edit") || command.equals("e")) 
 			{
-				if(dataset == null)
+				System.out.print("feature disabled due to some bug...\n");
+				/*if(dataset == null)
 					System.out.print("no dataset loaded. load from file (rf) or create one (c)");
 				else
 					dataset = Dataset.createFromJSONObject(editDataset());
 				
 				System.out.print("dataset successfully edited. GUID: " + dataset.getGUID() + "\n");
 				
-				printDataset();
+				printDataset();*/
 			}
 			
 			else if(command.equals("help") || command.equals("h"))
@@ -256,6 +256,11 @@ public class DatasetTool
 				testNodes();
 			}
 			
+			else if(command.equals("setnode") || command.equals("sn")) 
+			{
+				setActiveNode();
+			}
+			
 			else if(command.equals("upload") || command.equals("u")) 
 			{
 				if(dataset == null)
@@ -351,7 +356,7 @@ public class DatasetTool
 	
 	private static JSONObject editDataset()
 	{
-		// TODO use simple clonign maybe?
+		// TODO use simple cloning maybe?
 		Dataset oldDataset = Dataset.createFromJSONObject(dataset.exportJSONObject());
 		
 		Scanner in = new Scanner(System.in);
@@ -473,7 +478,7 @@ public class DatasetTool
 				}
 				finally
 				{
-					in.close();
+					//in.close();
 				}
 			}
 			
@@ -684,7 +689,7 @@ public class DatasetTool
 		}
 		finally
 		{
-			in.close();
+			//in.close();
 		}
 	}
 	
@@ -795,7 +800,7 @@ public class DatasetTool
 		return false;
 	}
 	
-	private static String addNode()
+	private static String setActiveNode()
 	{
 		try
 		{
@@ -828,11 +833,11 @@ public class DatasetTool
 				JSONObject jresponse = new JSONObject(response);
 				
 				if(jresponse.getInt("Code") == 200)
-					System.out.print("OK! [running version " + jresponse.getJSONObject("version").getString("version")
-							+ "#" + jresponse.getJSONObject("version").getInt("build") + "]\n");
+					System.out.print("OK! [running version " + jresponse.getJSONObject("version").getString("version") + "]\n");
 				else
 					System.out.print("FAILED!\n");
 			}
 		}
+		System.out.print("\n");
 	}
 }
