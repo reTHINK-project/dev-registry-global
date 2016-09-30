@@ -1,17 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	
 	<groupId>ReThink</groupId>
 	<artifactId>ReThink</artifactId>
 	<version>0.0.1</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-
+		
 		<plugins>
-
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
@@ -20,7 +21,7 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-
+			
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.7</version>
@@ -43,7 +44,7 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -64,7 +65,7 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -83,7 +84,7 @@
 					<finalName>gReg/gReg</finalName>
 				</configuration>
 			</plugin>
-
+			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -99,11 +100,9 @@
 					<mainClass>eu.rethink.globalregistry.daemon.GlobalRegistryServer</mainClass>
 				</configuration>
 			</plugin>
-
 		</plugins>
-
 	</build>
-
+	
 	<repositories>
 		<repository>
 			<id>tomp2p.net</id>
@@ -203,5 +202,4 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
-
 </project>
