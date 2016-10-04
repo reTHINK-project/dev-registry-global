@@ -105,7 +105,7 @@ public class DatasetTool
 				}
 				else if(inOverwriteDataset.equals("n"))
 				{
-					System.out.print("oborting...\n");
+					System.out.print("aborting...\n");
 				}
 				else
 				{
