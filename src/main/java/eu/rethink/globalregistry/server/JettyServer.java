@@ -34,6 +34,7 @@ public class JettyServer
 		server.setHandler(context);
 
 		server.start();
+		org.eclipse.jetty.http.HttpGenerator.setJettyVersion("Global Registry");
 		server.join();
 
 		LOGGER.debug("JettyServer started");
