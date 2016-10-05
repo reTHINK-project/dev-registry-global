@@ -6,6 +6,11 @@ default branch is now `tmp_master`
 
 ## Changelog
 
+### 0.2.2
+
+- dataset and schema have been updated to contain "userIDs" and "defaults".
+- DatasetTool updated
+
 ### 0.2.1
 
 - added DatasetTool to test GReg functionality and status (test/DatasetTool.java)
@@ -84,45 +89,63 @@ The dataset is expected to be a valid JSON Object of the following form:
 
 ```
 {
-		"$schema": "http://json-schema.org/draft-04/schema#",
-		"id": "http://jsonschema.net/rethink/greg/data",
-		"type": "object",
-		"properties": {
-			"guid": {
-				"id": "http://jsonschema.net/rethink/greg/data/guid",
-				"type": "string"
-			},
-			"userIDs": {
-				"id": "http://jsonschema.net/rethink/greg/data/userIDs",
-				"type": "array"
-			},
-			"lastUpdate": {
-				"id": "http://jsonschema.net/rethink/greg/data/lastUpdate",
-				"type": "string"
-			},
-			"timeout": {
-				"id": "http://jsonschema.net/rethink/greg/data/timeout",
-				"type": "string"
-			},
-			"publicKey": {
-				"id": "http://jsonschema.net/rethink/greg/data/publicKey",
-				"type": "string"
-			},
-			"salt": {
-				"id": "http://jsonschema.net/rethink/greg/data/salt",
-				"type": "string"
-			},
-			"active": {
-				"id": "http://jsonschema.net/rethink/greg/data/active",
-				"type": "integer"
-			},
-			"revoked": {
-				"id": "http://jsonschema.net/rethink/greg/data/revoked",
-				"type": "integer"
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"guid": {
+			"type": "string"
+		},
+		"userIDs": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"uid": {
+						"type": "string"
+					},
+					"domain": {
+						"type": "string"
+					}
+				},
+				"required": ["uid", "domain"]
 			}
 		},
-		"required": ["guid", "userIDs", "lastUpdate", "timeout", "publicKey", "salt", "active", "revoked"]
-	}
+		"lastUpdate": {
+			"type": "string"
+		},
+		"timeout": {
+			"type": "string"
+		},
+		"publicKey": {
+			"type": "string"
+		},
+		"salt": {
+			"type": "string"
+		},
+		"active": {
+			"type": "integer"
+		},
+		"revoked": {
+			"type": "integer"
+		},
+		"defaults": {
+			"type": "object",
+			"properties": {
+				"voice": {
+					"type": "string"
+				},
+				"chat": {
+					"type": "string"
+				},
+				"video": {
+					"type": "string"
+				}
+			},
+			"required": ["voice", "chat", "video"]
+		}
+	},
+	"required": ["guid", "userIDs", "lastUpdate", "timeout", "publicKey", "salt", "active", "revoked", "defaults"]
+}
 ```
 
 ### Example:
@@ -130,13 +153,24 @@ The dataset is expected to be a valid JSON Object of the following form:
 ```
 {
   "guid": "iTCLxibssOUXC2BeKctCxDRejbEw2YlvXsJQgdFa06c",
-  "userIDs": ["user://sebastian.goendoer.net/", "user://facebook.com/fluffy123"],
+  "userIDs": [{
+    "uid": "user://sebastian.goendoer.net/",
+    "domain": "google.com"
+  },{
+    "uid": "user://facebook.com/fluffy123",
+    "domain": "google.com"
+  }],
   "lastUpdate":"2015-09-24T08:24:27+00:00",
   "timeout":"2026-09-24T08:24:27+00:00",
   "publicKey":"-----BEGIN PUBLIC KEY-----MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE0ptQ88nO42/WDfuNNiNrHlaCGTRswXvbvfY9Ttg9RkVfqhBVKK+V1tHkNPp/WRzIQKwLKDgAzujAxzN8LhI7Hg==-----END PUBLIC KEY-----",
   "salt": "SpHuXwEGwrNcEcFoNS8Kv79PyGFlxi1v",
   "active": 1,
-  "revoked": 0
+  "revoked": 0,
+  "defaults": {
+    "voice": "a",
+    "chat": "b",
+    "video": "c"
+  }
 }
 ```
 
