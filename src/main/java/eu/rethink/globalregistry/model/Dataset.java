@@ -13,7 +13,10 @@ public class Dataset
 	protected String publicKey;
 	protected int active;
 	protected int revoked;
+	protected JSONObject defaults; 
 	
+
+
 	// TODO finish deserialize functionality
 	public static Dataset createFromJSONObject(JSONObject json)
 	{
@@ -27,6 +30,7 @@ public class Dataset
 		dataset.setUserIDs(json.getJSONArray("userIDs"));
 		dataset.setLastUpdate(json.getString("lastUpdate"));
 		dataset.setTimeout(json.getString("timeout"));
+		dataset.setDefaults(json.getJSONObject("defaults"));
 		
 		return dataset;
 	}
@@ -43,6 +47,7 @@ public class Dataset
 		json.put("active", this.active);
 		json.put("revoked", this.revoked);
 		json.put("guid", this.guid);
+		json.put("defaults", this.defaults);
 		
 		return json;
 	}
@@ -111,6 +116,14 @@ public class Dataset
 		this.revoked = revoked;
 	}
 	
+	public JSONObject getDefaults() {
+		return defaults;
+	}
+
+	public void setDefaults(JSONObject defaults) {
+		this.defaults = defaults;
+	}
+	
 	/* TODO this should be rewritten */
 	public static boolean checkDatasetValidity(JSONObject json) throws DatasetIntegrityException
 	{
@@ -128,7 +141,14 @@ public class Dataset
 			throw new DatasetIntegrityException("mandatory parameter 'salt' missing");
 		if(!json.has("revoked"))
 			throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
-		
+		if(!json.has("defaults"))
+			throw new DatasetIntegrityException("mandatory parameter 'defaults' missing");
+		if(json.getJSONObject("defaults").has("voice"))
+			throw new DatasetIntegrityException("mandatory parameter 'defaults : voice' missing");	
+		if(json.getJSONObject("defaults").has("chat"))
+			throw new DatasetIntegrityException("mandatory parameter 'defaults : chat' missing");	
+		if(json.getJSONObject("defaults").has("video"))
+			throw new DatasetIntegrityException("mandatory parameter 'defaults : video' missing");	
 		// for unknown reasons, this fails always
 		/*if(json.getString("guid").equals(GUID.createGUID(json.getString("publicKey"), json.getString("salt"))))
 			throw new DatasetIntegrityException("guid does not match publicKey/salt: "+ json.getString("publicKey") + " :: " + json.getString("salt"));*/
