@@ -8,9 +8,15 @@ default branch is now `tmp_master`
 
 ### 0.2.5
 
-- dataset and schema have been updated to contain "userIDs" and "defaults".
+- finalized implementation of changes to dataset and schema
+- added "schemaVersion" to dataset
 - DatasetTool updated
 - Responses now use HTTP response codes
+
+### 0.2.2
+
+- dataset and schema have been updated to contain "userIDs" and "defaults".
+- DatasetTool updated
 
 ### 0.2.1
 
@@ -96,6 +102,9 @@ The dataset is expected to be a valid JSON Object of the following form:
 		"guid": {
 			"type": "string"
 		},
+		"schemaVersion": {
+			"type": "integer"
+		},
 		"userIDs": {
 			"type": "array",
 			"items": {
@@ -154,6 +163,7 @@ The dataset is expected to be a valid JSON Object of the following form:
 ```
 {
   "guid": "iTCLxibssOUXC2BeKctCxDRejbEw2YlvXsJQgdFa06c",
+  "schemaVersion": 1,
   "userIDs": [{
     "uid": "user://sebastian.goendoer.net/",
     "domain": "google.com"
