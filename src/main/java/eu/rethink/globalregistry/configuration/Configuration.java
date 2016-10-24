@@ -13,13 +13,16 @@ public class Configuration
 	private Properties				prop;
 	
 	// fixed info
-	private static final String		versionName			= "0.2.5";
-	private static final int		versionNumber		= 1297;
-	private static final String		versionCode			= "";
-	private static final String		versionDate			= "2016-10-24";
-	private static final String		productName			= "reTHINK Global Registry";
-	private static final String		productNameShort	= "gReg";
-	private static String			filename			= "greg.config";
+	private static final String		versionName				= "0.2.5";
+	private static final int		versionNumber			= 1301;
+	private static final String		versionCode				= "";
+	private static final String		versionDate				= "2016-10-24";
+	private static final String		productName				= "reTHINK Global Registry";
+	private static final String		productNameShort		= "gReg";
+	private static String			filename				= "greg.config";
+	private static final int		versionDatasetSchema	= 1;
+	private static final int		versionRESTAPI			= 1;
+	private static final int		versionDHTAPI			= 1;
 	
 	// cvars
 	private int						portDHT;
