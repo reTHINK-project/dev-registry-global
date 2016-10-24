@@ -6,7 +6,7 @@ default branch is now `tmp_master`
 
 ## Changelog
 
-### 0.2.2
+### 0.2.5
 
 - dataset and schema have been updated to contain "userIDs" and "defaults".
 - DatasetTool updated
