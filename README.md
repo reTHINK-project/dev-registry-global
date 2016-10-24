@@ -10,6 +10,7 @@ default branch is now `tmp_master`
 
 - dataset and schema have been updated to contain "userIDs" and "defaults".
 - DatasetTool updated
+- Responses now use HTTP response codes
 
 ### 0.2.1
 
