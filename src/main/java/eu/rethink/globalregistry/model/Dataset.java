@@ -71,6 +71,10 @@ public class Dataset
 	public JSONArray getUserIDs() {
 		return userIDs;
 	}
+	
+	public JSONObject getUserIDs(int index) {
+		return userIDs.getJSONObject(index);
+	}
 
 	public void setUserIDs(JSONArray userIDs) {
 		this.userIDs = userIDs;
@@ -129,6 +133,8 @@ public class Dataset
 	{
 		if(!json.has("guid"))
 			throw new DatasetIntegrityException("mandatory parameter 'guid' missing");
+		
+		// TODO: userIDs are now objects. Rewrite check
 		if(!json.has("userIDs"))
 			throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");
 		if(!json.has("lastUpdate"))
@@ -143,11 +149,12 @@ public class Dataset
 			throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
 		if(!json.has("defaults"))
 			throw new DatasetIntegrityException("mandatory parameter 'defaults' missing");
-		if(json.getJSONObject("defaults").has("voice"))
+		
+		if(!json.getJSONObject("defaults").has("voice"))
 			throw new DatasetIntegrityException("mandatory parameter 'defaults : voice' missing");	
-		if(json.getJSONObject("defaults").has("chat"))
+		if(!json.getJSONObject("defaults").has("chat"))
 			throw new DatasetIntegrityException("mandatory parameter 'defaults : chat' missing");	
-		if(json.getJSONObject("defaults").has("video"))
+		if(!json.getJSONObject("defaults").has("video"))
 			throw new DatasetIntegrityException("mandatory parameter 'defaults : video' missing");	
 		// for unknown reasons, this fails always
 		/*if(json.getString("guid").equals(GUID.createGUID(json.getString("publicKey"), json.getString("salt"))))

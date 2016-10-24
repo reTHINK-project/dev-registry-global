@@ -41,7 +41,7 @@ public class DatasetTool
 	
 	private static void printHelp()
 	{
-		System.out.print("------------------------------\nv 0.0.5\n------------------------------\n");
+		System.out.print("------------------------------\nv 0.0.6\n------------------------------\n");
 		System.out.print("create, c:      create new dataset\n");
 		System.out.print("edit, e:        edit dataset\n");
 		System.out.print("exit, x:        exit\n");
@@ -649,12 +649,15 @@ public class DatasetTool
 			
 			while(inAddUserID.equals("y"))
 			{
-				System.out.print("specify userID: \n");
-				String inUserID = in.nextLine();
+				System.out.print("specify uID: \n");
+				String inUID = in.nextLine();
+				
+				System.out.print("specify domain: \n");
+				String inDomain = in.nextLine();
 				
 				// TODO implement format check
 				
-				userIDs.put(inUserID);
+				userIDs.put(new JSONObject().put("uID", inUID).put("domain", inDomain));
 				
 				System.out.print("add another UserID? (y|n) [n]: \n");
 				inAddUserID = in.nextLine();
@@ -662,6 +665,44 @@ public class DatasetTool
 			
 			if(!inAddUserID.equals("n"))
 				System.out.print("illegal parameter!\n");
+			
+			//////////////////////////////////////////////////
+						
+			JSONObject defaults = new JSONObject();
+			
+			System.out.print("default for voice: \n");
+			String inVoiceDefault = in.nextLine();
+			defaults.put("voice", inVoiceDefault);
+			
+			System.out.print("default for chat: \n");
+			String inChatDefault = in.nextLine();
+			defaults.put("chat", inChatDefault);
+			
+			System.out.print("default for video: \n");
+			String inVideoDefault = in.nextLine();
+			defaults.put("video", inVideoDefault);
+			
+			System.out.print("add another default? (y|n) [n]: \n");
+			String inAddDefault = in.nextLine();
+			
+			while(inAddDefault.equals("y"))
+			{
+				System.out.print("specify default name: \n");
+				String inDefaultName = in.nextLine();
+				
+				System.out.print("specify defautl value for [" + inDefaultName + "]: \n");
+				String inDefaultValue = in.nextLine();
+				
+				// TODO implement format check
+				
+				defaults.put(inDefaultName, inDefaultValue);
+				
+				System.out.print("add another default? (y|n) [n]: \n");
+				inAddDefault = in.nextLine();
+			}
+			
+			if(!inAddDefault.equals("n"))
+			System.out.print("illegal parameter!\n");
 			
 			System.out.print("finishing up... \n");
 			
@@ -674,6 +715,7 @@ public class DatasetTool
 			jsonDataset.put("active", active);
 			jsonDataset.put("revoked", revoked);
 			jsonDataset.put("guid", GUID.createGUID(publicKeyString, salt));
+			jsonDataset.put("defaults", defaults);
 			
 			JSONObject json = new JSONObject();
 			json.put("dataset", jsonDataset);
