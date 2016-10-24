@@ -13,15 +13,15 @@ public class Dataset
 	protected String publicKey;
 	protected int active;
 	protected int revoked;
-	protected JSONObject defaults; 
+	protected JSONObject defaults;
+	protected int schemaVersion;
 	
-
-
 	// TODO finish deserialize functionality
 	public static Dataset createFromJSONObject(JSONObject json)
 	{
 		Dataset dataset = new Dataset();
 		
+		dataset.setSchemaVersion(json.getInt("schemaVersion"));
 		dataset.setActive(json.getInt("active"));
 		dataset.setRevoked(json.getInt("revoked"));
 		dataset.setGUID(json.getString("guid"));
@@ -39,6 +39,7 @@ public class Dataset
 	{
 		JSONObject json = new JSONObject();
 		
+		json.put("schemaVersion", this.schemaVersion);
 		json.put("salt", this.salt);
 		json.put("userIDs", this.userIDs);
 		json.put("lastUpdate", this.lastUpdate);
@@ -58,6 +59,14 @@ public class Dataset
 
 	public void setGUID(String guid) {
 		this.guid = guid;
+	}
+	
+	public int getSchemaVersion() {
+		return schemaVersion;
+	}
+
+	public void setSchemaVersion(int schemaVersion) {
+		this.schemaVersion = schemaVersion;
 	}
 
 	public String getSalt() {
@@ -133,6 +142,8 @@ public class Dataset
 	{
 		if(!json.has("guid"))
 			throw new DatasetIntegrityException("mandatory parameter 'guid' missing");
+		if(!json.has("schemaVersion"))
+			throw new DatasetIntegrityException("mandatory parameter 'schemaVersion' missing");
 		
 		// TODO: userIDs are now objects. Rewrite check
 		if(!json.has("userIDs"))
