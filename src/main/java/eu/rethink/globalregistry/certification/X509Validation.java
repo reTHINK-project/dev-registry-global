@@ -18,17 +18,21 @@ public class X509Validation implements CertificateValidation{
 
     private final X509Reader certificateReader;
     private X509CertificateVerifier x509Verifier;
+    private CertificateManager certificateManager;
 
-    public X509Validation(X509Reader reader) {
+    public X509Validation(X509Reader reader, CertificateManager certificateManager) {
         this.certificateReader = reader;
         this.x509Verifier = new X509CertificateVerifier();
+        this.certificateManager = certificateManager;
     }
 
     @Override
     public boolean validate(PeerAddress peer, Message data) {
 
+        X509Certificate certificate = null;
+
         try {
-            X509Certificate certificate = certificateReader.readFromMessage(data);
+            certificate = certificateReader.readFromMessage(data);
             FileInputStream fis = null;
 
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -38,14 +42,17 @@ public class X509Validation implements CertificateValidation{
 
             x509Verifier.verifyCertificate(certificate, keystore);
 
-            //check peer identifier
+            certificateManager.put(peer.peerId(), new PeerCertificate(peer.peerId(), certificate, true));
+
+            //TODO: check peerID against the one in the certificate
 
             return true;
 
-        } catch (X509CertificateReadException | CertificateException | InvalidCertificateException e) {
+        } catch (InvalidCertificateException e) {
             System.out.println("Invalid certificate.");
+            certificateManager.put(peer.peerId(), new PeerCertificate(peer.peerId(), certificate, false));
             return false;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (X509CertificateReadException | CertificateException | NoSuchAlgorithmException e) {
             System.out.println("Invalid certificate.");
             return false;
         } catch (KeyStoreException | IOException e) {

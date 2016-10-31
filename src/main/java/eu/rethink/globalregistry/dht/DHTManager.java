@@ -7,19 +7,16 @@ import java.util.List;
 import java.util.Random;
 
 
+import eu.rethink.globalregistry.certification.CertificationPeerMapFilter;
 import eu.rethink.globalregistry.certification.HandshakeSetup;
+import eu.rethink.globalregistry.certification.CertificateManager;
 import net.tomp2p.connection.PeerConnection;
+import net.tomp2p.connection.PeerException;
 import net.tomp2p.dht.*;
 import eu.rethink.globalregistry.configuration.Configuration;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.*;
-import net.tomp2p.message.Message;
-import net.tomp2p.p2p.RequestP2PConfiguration;
-import net.tomp2p.peers.Number160;
-import net.tomp2p.peers.PeerAddress;
-import net.tomp2p.peers.PeerMapChangeListener;
-import net.tomp2p.peers.PeerStatistic;
-import net.tomp2p.rpc.ObjectDataReply;
+import net.tomp2p.peers.*;
 import net.tomp2p.storage.Data;
 import net.tomp2p.p2p.PeerBuilder;
 import net.tomp2p.replication.IndirectReplication;
@@ -47,14 +44,45 @@ public class DHTManager
 		Random rand = new Random();
 		Bindings bind = new Bindings();
 		Number160 peerId = new Number160(Configuration.getInstance().getPeerId());
+		final CertificateManager certificateManager = new CertificateManager();
+
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
+
 		peer = new PeerBuilderDHT(new PeerBuilder(peerId).ports(Configuration.getInstance().getPortDHT()).start()).start();
+
+		final HandshakeSetup handshake = new HandshakeSetup(peer, certificateManager);
+
+		peer.peerBean().addPeerStatusListener(new PeerStatusListener() {
+			@Override
+			public boolean peerFailed(PeerAddress remotePeer, PeerException exception) {
+				return false;
+			}
+
+			@Override
+			public boolean peerFound(PeerAddress remotePeer, PeerAddress referrer, PeerConnection peerConnection, RTT roundTripTime) {
+
+				if(!remotePeer.peerId().equals(peer.peerID()) && !certificateManager.exists(remotePeer.peerId())) {
+					handshake.askCertificate(remotePeer, peer.peerAddress());
+				}
+
+				return false;
+			}
+		});
+
+
+		PeerMapConfiguration peerMapConfig = new PeerMapConfiguration(peerId);
+		peerMapConfig.addMapPeerFilter(new CertificationPeerMapFilter(certificateManager));
+		PeerMap peerMap = new PeerMap(peerMapConfig);
+
+		peer.peer().peerBean().addPeerStatusListener(peerMap);
+
+		//bind new peer map with peer map filter
+		peer.peer().peerBean().peerMap(peerMap);
+
+		handshake.init();
 
 		new IndirectReplication(peer).start();
 
-		HandshakeSetup handshake = new HandshakeSetup(peer);
-		handshake.init();
-		
 		for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
 		{
 			InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);

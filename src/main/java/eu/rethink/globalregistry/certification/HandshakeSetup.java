@@ -29,14 +29,16 @@ public class HandshakeSetup {
     private final Gson GSON;
     private final X509Reader x509Reader;
     private final CertificateValidation certificateValidation;
+    private final CertificateManager certificateManager;
 
     PeerDHT peer;
 
-    public HandshakeSetup(PeerDHT peer) {
+    public HandshakeSetup(PeerDHT peer, CertificateManager certificateManager) {
         this.peer = peer;
         this.GSON = new Gson();
         this.x509Reader = new X509Reader();
-        this.certificateValidation = new X509Validation(x509Reader);
+        this.certificateValidation = new X509Validation(x509Reader, certificateManager);
+        this.certificateManager = certificateManager;
     }
 
     public void init() {
@@ -62,7 +64,7 @@ public class HandshakeSetup {
         });
 
         // Challenge new added peers
-        peer.peerBean().peerMap().addPeerMapChangeListener(new PeerMapChangeListener() {
+        /*peer.peerBean().peerMap().addPeerMapChangeListener(new PeerMapChangeListener() {
             @Override
             public void peerInserted(PeerAddress peerAddress, boolean verified) {
                 if(peer.peerID().compareTo(peerAddress.peerId()) != 0) {
@@ -80,7 +82,7 @@ public class HandshakeSetup {
             public void peerUpdated(PeerAddress peerAddress, PeerStatistic storedPeerAddress) {
                 System.out.println("[PEER UPDATED] Address: " + peerAddress.toString());
             }
-        });
+        });*/
     }
 
 

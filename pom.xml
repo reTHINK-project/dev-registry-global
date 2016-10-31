@@ -68,6 +68,27 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.2</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+            <configuration>
+              <file>lib/tomp2p-core-5.0-Beta8.jar</file>
+              <groupId>net.tomp2p</groupId>
+              <artifactId>tomp2p-core</artifactId>
+              <version>5.0-Beta8</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
+        </executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
@@ -106,7 +127,7 @@
 	<repositories>
 		<repository>
 			<id>tomp2p.net</id>
-			<url>http://tomp2p.net/dev/mvn/</url>
+			<url>https://tomp2p.net/dev/mvn/</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -116,10 +137,34 @@
 			<version>1.0.15</version>
 		</dependency>
 		<dependency>
-			<groupId>net.tomp2p</groupId>
-			<artifactId>tomp2p-all</artifactId>
-			<version>5.0-Beta8</version>
-			<scope>compile</scope>
+      <groupId>net.tomp2p</groupId>
+      <artifactId>tomp2p-replication</artifactId>
+      <version>5.0-Beta8</version>
+		</dependency>
+		<dependency>
+      <groupId>net.tomp2p</groupId>
+      <artifactId>tomp2p-nat</artifactId>
+      <version>5.0-Beta8</version>
+		</dependency>
+		<dependency>
+      <groupId>net.tomp2p</groupId>
+      <artifactId>tomp2p-storage</artifactId>
+      <version>5.0-Beta8</version>
+		</dependency>
+		<dependency>
+      <groupId>net.tomp2p</groupId>
+      <artifactId>tomp2p-dht</artifactId>
+      <version>5.0-Beta8</version>
+		</dependency>
+		<dependency>
+      <groupId>net.tomp2p</groupId>
+      <artifactId>tomp2p-tracker</artifactId>
+      <version>5.0-Beta8</version>
+		</dependency>
+		<dependency>
+      <groupId>net.tomp2p</groupId>
+      <artifactId>tomp2p-social</artifactId>
+      <version>5.0-Beta8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
