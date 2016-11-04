@@ -3,13 +3,16 @@ package eu.rethink.globalregistry.dht;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
+import java.security.spec.KeySpec;
 import java.util.List;
 import java.util.Random;
 
 
-import eu.rethink.globalregistry.certification.CertificationPeerMapFilter;
-import eu.rethink.globalregistry.certification.HandshakeSetup;
-import eu.rethink.globalregistry.certification.CertificateManager;
+import eu.rethink.globalregistry.certification.*;
+import eu.rethink.globalregistry.certification.exception.PrivateKeyReadException;
+import eu.rethink.globalregistry.certification.exception.X509CertificateReadException;
 import net.tomp2p.connection.PeerConnection;
 import net.tomp2p.connection.PeerException;
 import net.tomp2p.dht.*;
@@ -20,13 +23,14 @@ import net.tomp2p.peers.*;
 import net.tomp2p.storage.Data;
 import net.tomp2p.p2p.PeerBuilder;
 import net.tomp2p.replication.IndirectReplication;
+import org.apache.commons.codec.binary.Base64;
 
 public class DHTManager
 {
 	private static DHTManager	instance	= null;
 
  	private PeerDHT peer;
- 	
+
 	private DHTManager()
 	{
 
@@ -44,61 +48,77 @@ public class DHTManager
 		Random rand = new Random();
 		Bindings bind = new Bindings();
 		Number160 peerId = new Number160(Configuration.getInstance().getPeerId());
+		X509Reader x509Reader = new X509Reader();
 		final CertificateManager certificateManager = new CertificateManager();
 
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
 
-		peer = new PeerBuilderDHT(new PeerBuilder(peerId).ports(Configuration.getInstance().getPortDHT()).start()).start();
+		try {
 
-		final HandshakeSetup handshake = new HandshakeSetup(peer, certificateManager);
+			KeyPair keyPair = x509Reader.readKeyPair(peerId.toString());
 
-		peer.peerBean().addPeerStatusListener(new PeerStatusListener() {
-			@Override
-			public boolean peerFailed(PeerAddress remotePeer, PeerException exception) {
-				return false;
-			}
+			X509Certificate ownCertificate = x509Reader.readFromFile(peerId.toString());
+			certificateManager.setOwnCertificate(new PeerCertificate(peerId, ownCertificate, true));
 
-			@Override
-			public boolean peerFound(PeerAddress remotePeer, PeerAddress referrer, PeerConnection peerConnection, RTT roundTripTime) {
+			peer = new PeerBuilderDHT(new PeerBuilder(peerId).keyPair(keyPair).ports(Configuration.getInstance().getPortDHT()).start()).start();
 
-				if(!remotePeer.peerId().equals(peer.peerID()) && !certificateManager.exists(remotePeer.peerId())) {
-					handshake.askCertificate(remotePeer, peer.peerAddress());
+			final HandshakeSetup handshake = new HandshakeSetup(peer, certificateManager);
+
+			peer.peerBean().addPeerStatusListener(new PeerStatusListener() {
+				@Override
+				public boolean peerFailed(PeerAddress remotePeer, PeerException exception) {
+					return false;
 				}
 
-				return false;
+				@Override
+				public boolean peerFound(PeerAddress remotePeer, PeerAddress referrer, PeerConnection peerConnection, RTT roundTripTime) {
+
+					if(!remotePeer.peerId().equals(peer.peerID()) && !certificateManager.exists(remotePeer.peerId())) {
+						handshake.askCertificate(remotePeer, peer.peerAddress());
+					}
+
+					return false;
+				}
+			});
+
+
+			PeerMapConfiguration peerMapConfig = new PeerMapConfiguration(peerId);
+			peerMapConfig.addMapPeerFilter(new CertificationPeerMapFilter(certificateManager));
+			PeerMap peerMap = new PeerMap(peerMapConfig);
+
+			peer.peer().peerBean().addPeerStatusListener(peerMap);
+
+			//bind new peer map with peer map filter
+			peer.peer().peerBean().peerMap(peerMap);
+
+			handshake.init();
+
+			new IndirectReplication(peer).start();
+
+			for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
+			{
+				InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);
+				FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
+				futureDiscover.awaitUninterruptibly();
+				FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
+
+				futureBootstrap.awaitUninterruptibly();
 			}
-		});
 
+			return this;
 
-		PeerMapConfiguration peerMapConfig = new PeerMapConfiguration(peerId);
-		peerMapConfig.addMapPeerFilter(new CertificationPeerMapFilter(certificateManager));
-		PeerMap peerMap = new PeerMap(peerMapConfig);
-
-		peer.peer().peerBean().addPeerStatusListener(peerMap);
-
-		//bind new peer map with peer map filter
-		peer.peer().peerBean().peerMap(peerMap);
-
-		handshake.init();
-
-		new IndirectReplication(peer).start();
-
-		for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
-		{
-			InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);
-			FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
-			futureDiscover.awaitUninterruptibly();
-			FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
-
-			futureBootstrap.awaitUninterruptibly();
+		} catch (X509CertificateReadException e) {
+			e.printStackTrace();
+		} catch (PrivateKeyReadException e) {
+			e.printStackTrace();
 		}
-		
-		return this;
+
+		return null;
 	}
 
 	/**
 	 * Retrieves the social record from the DHT.
-	 * 
+	 *
 	 * @param key
 	 * @return the social record
 	 * @throws ClassNotFoundException
@@ -108,19 +128,19 @@ public class DHTManager
 	{
 		FutureGet futureGet = peer.get(Number160.createHash(key)).start();
 		futureGet.awaitUninterruptibly();
-		
+
 		// TODO: use non-blocking?
 		if(futureGet.isSuccess() && futureGet.data() != null)
 		{
 			return futureGet.data().object().toString();
 		}
-		
+
 		return null; // TODO: decide on sentinel value
 	}
 
 	/**
 	 * Stores the social record in the DHT.
-	 * 
+	 *
 	 * @param key
 	 *            : the GID
 	 * @param value
@@ -133,11 +153,11 @@ public class DHTManager
 		futurePut.awaitUninterruptibly();
 		// TODO: use non-blocking?
 	}
-	
-	
+
+
 	/**
 	 * removes a key from the DHT. Should ONLY be used for the tests
-	 * 
+	 *
 	 * @param key
 	 * @throws IOException
 	 */
@@ -145,9 +165,9 @@ public class DHTManager
 	{
 		peer.remove(Number160.createHash(key)).start();
 	}
-	
+
 	public List<PeerAddress> getAllNeighbors() {
-		
-		return peer.peerBean().peerMap().all(); 
+
+		return peer.peerBean().peerMap().all();
 	}
 }

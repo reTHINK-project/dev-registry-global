@@ -11,6 +11,7 @@ public class CertificateManager {
 
     //concurrency?
     private Map<Number160, PeerCertificate> certificates;
+    private PeerCertificate ownCertificate;
 
     public CertificateManager() {
         this.certificates = new HashMap<>();
@@ -28,5 +29,12 @@ public class CertificateManager {
         return certificates.containsKey(peerId);
     }
 
+    public PeerCertificate getOwnCertificate() {
+        return ownCertificate;
+    }
+
+    public void setOwnCertificate(PeerCertificate ownCertificate) {
+        this.ownCertificate = ownCertificate;
+    }
 }
 
