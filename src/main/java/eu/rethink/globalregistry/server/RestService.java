@@ -80,13 +80,13 @@ public class RestService {
 	public Response getData(@PathParam("guid") String guid) {
 		LOGGER.info("GET Request received for GUID " + guid);
 		// TODO verify format of GlobalID
-		Response finalRespons;
+		Response finalResponse;
 
 		JSONObject response = new JSONObject();
 		response.put("Code", 404);
 		response.put("Description", "GUID not found");
 		response.put("Value", "");
-		finalRespons = Response.status(Response.Status.NOT_FOUND).entity(response.toString()).build();
+		finalResponse = Response.status(Response.Status.NOT_FOUND).entity(response.toString()).build();
 
 		if (guid != null) {
 			// retrieve data from TomP2P
@@ -103,23 +103,23 @@ public class RestService {
 						response.put("Description", "OK");
 						response.put("Value", jwt);
 
-						finalRespons = Response.ok(response.toString(), MediaType.APPLICATION_JSON).build();
+						finalResponse = Response.ok(response.toString(), MediaType.APPLICATION_JSON).build();
 					} catch (JSONException e) {
 						LOGGER.error("Faulty data in DHT! This should not happen! " + e.getMessage());
 					}
 				}
-			} catch (ClassNotFoundException | IOException e) {
+			} catch (IOException | ClassNotFoundException e) {
 				LOGGER.error("Error while getting data from DHT: " + e.getMessage());
 				response.put("Code", 500);
 				response.put("Description", "Internal server error");
 				response.put("Value", "");
 
-				finalRespons = Response.serverError().entity(response.toString()).build();
+				finalResponse = Response.serverError().entity(response.toString()).build();
 			}
 		}
 		// respond with data from TomP2P
 
-		return finalRespons;
+		return finalResponse;
 	}
 
 	/**

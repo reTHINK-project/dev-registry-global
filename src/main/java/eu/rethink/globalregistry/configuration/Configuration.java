@@ -14,9 +14,9 @@ public class Configuration
 	
 	// fixed info
 	private static final String		versionName				= "0.2.5";
-	private static final int		versionNumber			= 1301;
+	private static final int		versionNumber			= 1305;
 	private static final String		versionCode				= "";
-	private static final String		versionDate				= "2016-10-24";
+	private static final String		versionDate				= "2016-11-01";
 	private static final String		productName				= "reTHINK Global Registry";
 	private static final String		productNameShort		= "gReg";
 	private static String			filename				= "greg.config";

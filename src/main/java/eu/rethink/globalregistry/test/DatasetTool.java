@@ -716,6 +716,7 @@ public class DatasetTool
 			jsonDataset.put("revoked", revoked);
 			jsonDataset.put("guid", GUID.createGUID(publicKeyString, salt));
 			jsonDataset.put("defaults", defaults);
+			jsonDataset.put("schemaVersion", 1);
 			
 			JSONObject json = new JSONObject();
 			json.put("dataset", jsonDataset);

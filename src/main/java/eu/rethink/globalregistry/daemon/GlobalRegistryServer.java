@@ -72,7 +72,7 @@ public class GlobalRegistryServer implements Daemon
 				configFile = Configuration.getInstance().getConfigFilename();
 			}
 				
-			System.out.println("Initializing SONIC - loading gsls.config");
+			System.out.println("Initializing GlobalRegistry - loading greg.config");
 			String pathToConfig = configFile;
 			String fullPathToConfig = pathToConfig + File.separator + "greg.config";
 			//String fullPathToConfig = pathToConfig;
