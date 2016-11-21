@@ -41,12 +41,13 @@ public class DatasetTool
 	
 	private static void printHelp()
 	{
-		System.out.print("------------------------------\nv 0.0.6\n------------------------------\n");
+		System.out.print("------------------------------\nv 0.0.7\n------------------------------\n");
 		System.out.print("create, c:      create new dataset\n");
 		System.out.print("edit, e:        edit dataset\n");
 		System.out.print("exit, x:        exit\n");
 		System.out.print("help, h:        print this help\n");
 		System.out.print("print, p:       print current dataset\n");
+		System.out.print("jwt, j:         print signed jwt for current dataset\n");
 		System.out.print("quit, q:        exit\n");
 		System.out.print("readfile, rf:   read dataset from file\n");
 		System.out.print("resolve, r:     resolve guid via global registry\n");
@@ -302,6 +303,35 @@ public class DatasetTool
 					GlobalRegistryAPI.putData(activeNode + ":" + GREG_PORT, dataset.getGUID(), jwt);
 					
 					System.out.println("ok");
+				}
+			}
+			
+			else if(command.equals("jwt") || command.equals("j")) 
+			{
+				if(dataset == null)
+					System.out.print("no dataset loaded. load from file (rf) or create one (c)");
+				else
+				{
+					String encodedClaim = new String(Base64UrlCodec.BASE64URL.encode(dataset.exportJSONObject().toString()));
+					
+					System.out.print("creating JWT... ");
+					String jwt = "";
+					
+					try
+					{
+						jwt = Jwts.builder().claim("data", encodedClaim).signWith(SignatureAlgorithm.ES256, ECDSAKeyPairManager.decodePrivateKey(privateKey)).compact();
+					}
+					catch (InvalidKeySpecException e)
+					{
+						e.printStackTrace();
+					}
+					catch (NoSuchAlgorithmException e)
+					{
+						e.printStackTrace();
+					}
+					
+					System.out.println("ok");
+					System.out.println("\n  [ jwt: " + jwt + " ]\n");
 				}
 			}
 			
