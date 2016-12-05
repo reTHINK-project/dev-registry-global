@@ -48,13 +48,39 @@ public class DHTManager
 		Random rand = new Random();
 		Bindings bind = new Bindings();
 		Number160 peerId = new Number160(Configuration.getInstance().getPeerId());
-		X509Reader x509Reader = new X509Reader();
-		final CertificateManager certificateManager = new CertificateManager();
+		String certificationOption = Configuration.getInstance().getCertification();
 
 		bind.addInterface(Configuration.getInstance().getNetworkInterface());
 
-		try {
+		if(certificationOption.equals("CA")) {
+			System.out.println("[PEER-CERTIFICATION] Certificate Authority mechanism loaded.");
+			initPeerCertification(peerId);
+		} else {
+			System.out.println("[PEER-CERTIFICATION] No mechanism loaded.");
+			peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
+		}
 
+		new IndirectReplication(peer).start();
+
+		for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
+		{
+			InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);
+			FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
+			futureDiscover.awaitUninterruptibly();
+			FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
+
+			futureBootstrap.awaitUninterruptibly();
+		}
+
+		return this;
+
+	}
+
+	public void initPeerCertification(Number160 peerId) {
+		X509Reader x509Reader = new X509Reader();
+		final CertificateManager certificateManager = new CertificateManager();
+
+		try {
 			KeyPair keyPair = x509Reader.readKeyPair(peerId.toString());
 
 			X509Certificate ownCertificate = x509Reader.readFromFile(peerId.toString());
@@ -66,12 +92,12 @@ public class DHTManager
 
 			peer.peerBean().addPeerStatusListener(new PeerStatusListener() {
 				@Override
-				public boolean peerFailed(PeerAddress remotePeer, PeerException exception) {
+				public boolean peerFailed(PeerAddress peerAddress, PeerException e) {
 					return false;
 				}
 
 				@Override
-				public boolean peerFound(PeerAddress remotePeer, PeerAddress referrer, PeerConnection peerConnection, RTT roundTripTime) {
+				public boolean peerFound(PeerAddress remotePeer, PeerAddress referrer, PeerConnection peerConnection, RTT rtt) {
 
 					if(!remotePeer.peerId().equals(peer.peerID()) && !certificateManager.exists(remotePeer.peerId())) {
 						handshake.askCertificate(remotePeer, peer.peerAddress());
@@ -80,7 +106,6 @@ public class DHTManager
 					return false;
 				}
 			});
-
 
 			PeerMapConfiguration peerMapConfig = new PeerMapConfiguration(peerId);
 			peerMapConfig.addMapPeerFilter(new CertificationPeerMapFilter(certificateManager));
@@ -93,27 +118,15 @@ public class DHTManager
 
 			handshake.init();
 
-			new IndirectReplication(peer).start();
-
-			for(int i=0; i<Configuration.getInstance().getKnownHosts().length; i++)
-			{
-				InetAddress address = Inet4Address.getByName(Configuration.getInstance().getKnownHosts()[0]);
-				FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
-				futureDiscover.awaitUninterruptibly();
-				FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Configuration.getInstance().getPortDHT()).start();
-
-				futureBootstrap.awaitUninterruptibly();
-			}
-
-			return this;
-
 		} catch (X509CertificateReadException e) {
 			e.printStackTrace();
 		} catch (PrivateKeyReadException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
-		return null;
+
 	}
 
 	/**

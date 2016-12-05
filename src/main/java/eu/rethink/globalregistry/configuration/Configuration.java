@@ -31,6 +31,7 @@ public class Configuration
 	private String					networkInterface;
 	private String					logPath;
 	private String                  peerId;
+	private String					certification;
 
 	// private Scanner scan;
 
@@ -90,6 +91,11 @@ public class Configuration
 		this.logPath = logPath;
 	}
 
+	public String getCertification()
+	{
+		return certification;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////////////////////////
 	// config file handling
 	// /////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,6 +124,7 @@ public class Configuration
 
 			this.newDHTSystem = Integer.parseInt(prop.getProperty("new_dht_system"));
 			this.peerId = prop.getProperty("peer_id");
+			this.certification = prop.getProperty("peer_certification");
 
 			input.close();
 		}
@@ -132,6 +139,7 @@ public class Configuration
 			this.logPath = "/usr/local/gReg/log";
 
 			this.newDHTSystem = 1;
+			this.certification = "none";
 
 			//e.printStackTrace();
 		}
