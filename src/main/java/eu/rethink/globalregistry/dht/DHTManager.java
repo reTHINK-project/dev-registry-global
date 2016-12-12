@@ -13,11 +13,9 @@ import java.util.Random;
 import eu.rethink.globalregistry.certification.*;
 import eu.rethink.globalregistry.certification.exception.PrivateKeyReadException;
 import eu.rethink.globalregistry.certification.exception.X509CertificateReadException;
-import net.tomp2p.connection.PeerConnection;
-import net.tomp2p.connection.PeerException;
+import net.tomp2p.connection.*;
 import net.tomp2p.dht.*;
 import eu.rethink.globalregistry.configuration.Configuration;
-import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.*;
 import net.tomp2p.peers.*;
 import net.tomp2p.storage.Data;
@@ -54,7 +52,7 @@ public class DHTManager
 
 		if(certificationOption.equals("CA")) {
 			System.out.println("[PEER-CERTIFICATION] Certificate Authority mechanism loaded.");
-			initPeerCertification(peerId);
+			initPeerCertification(peerId, bind);
 		} else {
 			System.out.println("[PEER-CERTIFICATION] No mechanism loaded.");
 			peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Configuration.getInstance().getPortDHT()).start()).start();
@@ -76,7 +74,7 @@ public class DHTManager
 
 	}
 
-	public void initPeerCertification(Number160 peerId) {
+	public void initPeerCertification(Number160 peerId, Bindings bindings) {
 		X509Reader x509Reader = new X509Reader();
 		final CertificateManager certificateManager = new CertificateManager();
 
@@ -86,7 +84,23 @@ public class DHTManager
 			X509Certificate ownCertificate = x509Reader.readFromFile(peerId.toString());
 			certificateManager.setOwnCertificate(new PeerCertificate(peerId, ownCertificate, true));
 
-			peer = new PeerBuilderDHT(new PeerBuilder(peerId).keyPair(keyPair).ports(Configuration.getInstance().getPortDHT()).start()).start();
+			SignatureFactory signatureFactory = new P2PSignatureFactory(certificateManager);
+			ChannelClientConfiguration clientConfiguration = PeerBuilder.createDefaultChannelClientConfiguration();
+			ChannelServerConfiguration serverConfiguration = PeerBuilder.createDefaultChannelServerConfiguration();
+			clientConfiguration.bindings(new Bindings());
+			serverConfiguration.bindings(new Bindings());
+
+			clientConfiguration.signatureFactory(signatureFactory);
+			serverConfiguration.signatureFactory(signatureFactory);
+
+			peer = new PeerBuilderDHT(new PeerBuilder(peerId)
+					.keyPair(keyPair)
+					.channelServerConfiguration(serverConfiguration)
+					.channelClientConfiguration(clientConfiguration)
+					.ports(Configuration.getInstance().getPortDHT()).start())
+					.start();
+
+
 
 			final HandshakeSetup handshake = new HandshakeSetup(peer, certificateManager);
 
