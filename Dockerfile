@@ -9,9 +9,10 @@ WORKDIR /build
 # Dependencies
 ADD pom.xml /build/pom.xml
 ADD *.cert.pem /build/
-ADD node-1-config /build/node-1-config
-ADD node-2-config /build/node-2-config
+ADD *.private.der /build/
+ADD lib/ /build/lib
 ADD rethink-ca /build/rethink-ca
+ADD greg.config /build/greg.config
 ADD docker-entrypoint.sh /
 RUN ["mvn", "dependency:resolve"]
 RUN ["mvn", "verify"]

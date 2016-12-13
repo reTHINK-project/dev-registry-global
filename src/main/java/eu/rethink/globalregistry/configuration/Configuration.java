@@ -32,6 +32,7 @@ public class Configuration
 	private String					logPath;
 	private String                  peerId;
 	private String					certification;
+    private int                  newDHTSystem;
 
 	// private Scanner scan;
 
