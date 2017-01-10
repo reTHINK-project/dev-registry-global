@@ -11,6 +11,21 @@ public class Config
 {
 	private static Config _singleton = null;
 	
+	private static final String		versionName				= "0.3.0";
+	private static final int		versionNumber			= 1400;
+	private static final String		versionCode				= "springified";
+	private static final String		versionDate				= "2017-01-10";
+	private static final String		productName				= "reTHINK Global Registry";
+	private static final String		productNameShort		= "gReg";
+	private static final int		versionDatasetSchema	= 1;
+	private static final int		versionRESTAPI			= 1;
+	private static final int		versionDHTAPI			= 1;
+	
+	private static final String		networkInterfaceDefault	= "eth0";
+	private static final String		logPathDefault			= "133.149.22.133";
+	private static final String		connectNodeDefault		= "logs";
+	private static final int		portRESTDefault			= 5002;
+	
 	private String networkInterface;
 	private String logPath;
 	private String connectNode;
@@ -32,10 +47,10 @@ public class Config
 	
 	private void setDefaultValues()
 	{
-		this.networkInterface = "eth0";
-		this.connectNode = "133.149.22.133";
-		this.logPath = "logs"; // TODO check if this is working
-		this.portREST = 5002;
+		this.networkInterface = networkInterfaceDefault;
+		this.connectNode = connectNodeDefault;
+		this.logPath = logPathDefault; // TODO check if this is working
+		this.portREST = portRESTDefault;
 	}
 	
 	public String getNetworkInterface() {
@@ -68,5 +83,70 @@ public class Config
 	
 	public void setPortREST(int portREST) {
 		this.portREST = portREST;
+	}
+	
+	/**
+	 * retrieves the product name as a String
+	 *
+	 * @return String
+	 */
+	public String getProductName()
+	{
+		return productName;
+	}
+	
+	/**
+	 * retrieves the product name short as a String
+	 *
+	 * @return String
+	 */
+	public String getProductNameShort()
+	{
+		return productNameShort;
+	}
+	
+	/**
+	 * retrieves the version number as a String, e.g. "0.1.2"
+	 *
+	 * @return String
+	 */
+	public String getVersionName()
+	{
+		return versionName;
+	}
+	
+	/**
+	 * retrieves the date of the build, e.g. 2014-08-22
+	 *
+	 * @return String
+	 */
+	public String getVersionDate()
+	{
+		return versionDate;
+	}
+	
+	public int getVersionNumber()
+	{
+		return versionNumber;
+	}
+	
+	public String getVersionCode()
+	{
+		return versionCode;
+	}
+	
+	public int getVersaionDatasetSchema()
+	{
+		return versionDatasetSchema;
+	}
+	
+	public int getVersionRESTAPI()
+	{
+		return versionRESTAPI;
+	}
+	
+	public int getVersionDHTAPI()
+	{
+		return versionDHTAPI;
 	}
 }
