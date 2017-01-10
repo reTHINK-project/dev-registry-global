@@ -24,8 +24,8 @@ public class Config
 	private static final int		versionDHTAPI			= 1;
 	
 	private static final String		networkInterfaceDefault	= "eth0";
-	private static final String		logPathDefault			= "133.149.22.133";
-	private static final String		connectNodeDefault		= "logs";
+	private static final String		logPathDefault			= "logs";
+	private static final String		connectNodeDefault		= "130.149.22.133";
 	private static final int		portRESTDefault			= 5002;
 	
 	private String networkInterface;
