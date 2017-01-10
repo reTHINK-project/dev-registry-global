@@ -1,4 +1,4 @@
-package com.MVC.model;
+package globalregistry.model;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.MVC.util;
+package globalregistry.util;
 
 import io.jsonwebtoken.impl.Base64Codec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

@@ -1,4 +1,4 @@
-package com.MVC.util;
+package globalregistry.util;
 
 /**
  * Created by Half-Blood on 1/4/2017.

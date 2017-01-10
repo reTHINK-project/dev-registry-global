@@ -1,6 +1,6 @@
-package com.MVC.model;
+package globalregistry.model;
 
-import com.MVC.util.ECDSAKeyPairManager;
+import globalregistry.util.ECDSAKeyPairManager;
 import io.jsonwebtoken.impl.Base64UrlCodec;
 
 import javax.crypto.Mac;

@@ -1,4 +1,4 @@
-package com.MVC.util;
+package globalregistry.util;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

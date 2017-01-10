@@ -1,6 +1,6 @@
-package com.MVC.dht;
+package globalregistry.dht;
 
-import com.MVC.configuration.Config;
+import globalregistry.configuration.Config;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.dht.FutureGet;
 import net.tomp2p.dht.FuturePut;
@@ -13,6 +13,7 @@ import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.replication.IndirectReplication;
 import net.tomp2p.storage.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.util.Random;
 @Repository
 public class DHTManager
 {
+	@Autowired
 	private static DHTManager	instance	= null;
 	private PeerDHT peer;
 	
@@ -54,7 +56,7 @@ public class DHTManager
 		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Config.getInstance().getPortDHT()).start()).start();
 		
 		new IndirectReplication(peer).start();
-		
+
 		InetAddress address = Inet4Address.getByName(Config.getInstance().getConnectNode());
 		FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Config.getInstance().getPortDHT()).start();
 		futureDiscover.awaitUninterruptibly();

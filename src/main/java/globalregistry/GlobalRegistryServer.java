@@ -1,9 +1,9 @@
-package com.MVC;
+package globalregistry;
 
+import globalregistry.configuration.Config;
+import globalregistry.dht.DHTManager;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.MVC.configuration.Config;
-import com.MVC.dht.DHTManager;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -132,7 +132,7 @@ public class GlobalRegistryServer implements Daemon
 			LOGGER.info("initializing Global Registry server... ");
 			
 			//JettyServer.start();
-			//System.getProperties().put("server.port", 5002); //<-- what was that!?
+			System.getProperties().put("server.port", 5002); //<-- what was that!?
 			SpringApplication.run(GlobalRegistryServer.class, args);
 		}
 		catch (Exception e)

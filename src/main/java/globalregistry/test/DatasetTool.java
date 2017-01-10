@@ -1,10 +1,10 @@
-package com.MVC.test;
+package globalregistry.test;
 
-import com.MVC.model.Dataset;
-import com.MVC.model.DatasetIntegrityException;
-import com.MVC.model.GUIDs;
-import com.MVC.util.ECDSAKeyPairManager;
-import com.MVC.util.XSDDateTime;
+import globalregistry.model.Dataset;
+import globalregistry.model.DatasetIntegrityException;
+import globalregistry.model.GUIDs;
+import globalregistry.util.ECDSAKeyPairManager;
+import globalregistry.util.XSDDateTime;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;

@@ -10,6 +10,22 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-all:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-core:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport:4.0.28.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.0.28.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-common:4.0.28.Final" level="project" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-nat:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: org.bitlet:weupnp:0.1.2" level="project" />
+    <orderEntry type="library" name="Maven: com.ganyo:gcm-server:1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-android:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-replication:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-storage:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: org.mapdb:mapdb:1.0.6" level="project" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-dht:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-tracker:5.0-Beta8" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.21" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:1.4.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.4.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.4.2.RELEASE" level="project" />
@@ -45,22 +61,6 @@
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.54" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.2" level="project" />
     <orderEntry type="library" name="Maven: commons-daemon:commons-daemon:1.0.15" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-all:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-core:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-transport:4.0.28.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.0.28.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-common:4.0.28.Final" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-nat:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: org.bitlet:weupnp:0.1.2" level="project" />
-    <orderEntry type="library" name="Maven: com.ganyo:gcm-server:1.0.2" level="project" />
-    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-android:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-replication:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-storage:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: org.mapdb:mapdb:1.0.6" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-dht:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: net.tomp2p:tomp2p-tracker:5.0-Beta8" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.21" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:1.4.2.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-test:1.4.2.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-test-autoconfigure:1.4.2.RELEASE" level="project" />

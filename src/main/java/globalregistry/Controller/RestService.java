@@ -1,13 +1,12 @@
-package com.MVC.Controller;
+package globalregistry.Controller;
 
-import com.MVC.Service.EntityService;
-import com.MVC.configuration.Config;
-import com.MVC.dht.DHTManager;
-import com.MVC.model.Dataset;
-import com.MVC.model.DatasetIntegrityException;
-import com.MVC.model.GUIDs;
-import com.MVC.util.ECDSAKeyPairManager;
-import com.MVC.util.IntegrityException;
+import globalregistry.configuration.Config;
+import globalregistry.dht.DHTManager;
+import globalregistry.model.Dataset;
+import globalregistry.model.DatasetIntegrityException;
+import globalregistry.model.GUIDs;
+import globalregistry.util.ECDSAKeyPairManager;
+import globalregistry.util.IntegrityException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -39,8 +38,6 @@ import java.util.List;
 public class RestService {
 
     @Autowired
-    private EntityService entityService;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RestService.class);
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,8 +83,7 @@ public class RestService {
         finalresponse = new ResponseEntity<String>(response.toString(), HttpStatus.NOT_FOUND);
         if(GUID != null){
             try{
-                //String jwt = DHTManager.getInstance().get(GUID);
-                String jwt = entityService.getEntitybyGUID(GUID);
+                String jwt = DHTManager.getInstance().get(GUID);
                 if(jwt != null) {
                     try{
                         response.put("Code", 200);
@@ -163,8 +159,7 @@ public class RestService {
 
             // check for an already existing jwt in the DHT
 
-            //String dhtResult = DHTManager.getInstance().get(guid);
-            String dhtResult = entityService.getEntitybyGUID(GUID);
+            String dhtResult = DHTManager.getInstance().get(GUID);
 
             if(dhtResult != null){
                 // updating an existing dataset
@@ -182,8 +177,7 @@ public class RestService {
                 if (!data.getString("guid").equals(existingData.getString("guid")))
                     throw new IntegrityException("GUIDs are not matching!");
                 LOGGER.info("Dataset for [" + GUID + "] updated: \n" + jwt);
-                //DHTManager.getInstance().put(GUID, jwt);
-                entityService.updateEntity(jwt, GUID);
+                DHTManager.getInstance().put(GUID, jwt);
                 response.put("Code", 200);
                 response.put("Description", "OK");
                 response.put("Value", "");
@@ -193,8 +187,7 @@ public class RestService {
                 // writing a new dataset
 
                 // in this case, there is no dataset for this GUID in the DHT
-                //DHTManager.getInstance().put(GUID, jwt);
-                entityService.insertEntity(jwt, GUID);
+                DHTManager.getInstance().put(GUID, jwt);
                 LOGGER.info("Dataset for [" + GUID + "] written to DHT: \n" + jwt);
                 response.put("Code", 200);
                 response.put("Description", "OK");

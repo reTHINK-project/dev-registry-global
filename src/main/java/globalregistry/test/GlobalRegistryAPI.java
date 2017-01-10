@@ -1,4 +1,4 @@
-package com.MVC.test;
+package globalregistry.test;
 
 import org.json.JSONObject;
 

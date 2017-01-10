@@ -1,4 +1,4 @@
-package com.MVC.model;
+package globalregistry.model;
 
 /**
  * Created by Half-Blood on 1/4/2017.
