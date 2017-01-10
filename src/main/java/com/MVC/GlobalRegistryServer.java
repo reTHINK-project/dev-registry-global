@@ -121,18 +121,18 @@ public class GlobalRegistryServer implements Daemon
 		{
 			System.out.println("Wrong parameter. Error: " + e.getMessage());
 		}
-		LOGGER.info("initializing DHT... ");
 		
 		try
 		{
+			LOGGER.info("initializing DHT... ");
+			
 			DHTManager.getInstance().initDHT();
 			LOGGER.info("DHT initialized successfully");
 		
-			// init GlobalRegistry server
 			LOGGER.info("initializing Global Registry server... ");
 			
 			//JettyServer.start();
-			System.getProperties().put("server.port", 5002);
+			//System.getProperties().put("server.port", 5002); //<-- what was that!?
 			SpringApplication.run(GlobalRegistryServer.class, args);
 		}
 		catch (Exception e)
@@ -145,7 +145,7 @@ public class GlobalRegistryServer implements Daemon
 	@Override
 	public void init(DaemonContext daemonContext) throws DaemonInitException, Exception
 	{
-		System.out.println("deamon: init()");
+		//System.out.println("deamon: init()");
 		String arguments[] = daemonContext.getArguments();
 		System.out.println(arguments);
 		GlobalRegistryServer.main(arguments);
@@ -154,18 +154,18 @@ public class GlobalRegistryServer implements Daemon
 	@Override
 	public void start() throws Exception
 	{
-		System.out.println("deamon: start()");
+		//System.out.println("deamon: start()");
 	}
 	
 	@Override
 	public void stop() throws Exception
 	{
-		System.out.println("deamon: exception()");
+		//System.out.println("deamon: exception()");
 	}
 	
 	@Override
 	public void destroy()
 	{
-		System.out.println("deamon: destroy()");
+		//System.out.println("deamon: destroy()");
 	}
 }

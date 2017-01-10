@@ -1,7 +1,7 @@
 package com.MVC.Controller;
 
 import com.MVC.Service.EntityService;
-import com.MVC.configuration.Configuration;
+import com.MVC.configuration.Config;
 import com.MVC.dht.DHTManager;
 import com.MVC.model.Dataset;
 import com.MVC.model.DatasetIntegrityException;
@@ -56,8 +56,8 @@ public class RestService {
         }
 
         JSONObject version = new JSONObject();
-        version.put("version", Configuration.getInstance().getVersionName());
-        version.put("build", Configuration.getInstance().getVersionNumber());
+        version.put("version", Config.getInstance().getVersionName());
+        version.put("build", Config.getInstance().getVersionNumber());
 
         JSONObject response = new JSONObject();
         response.put("Code", 200);
