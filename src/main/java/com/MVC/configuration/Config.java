@@ -17,6 +17,8 @@ public class Config
 	private static final String		versionDate				= "2017-01-10";
 	private static final String		productName				= "reTHINK Global Registry";
 	private static final String		productNameShort		= "gReg";
+	
+	private static final int		portDHT					= 5001;
 	private static final int		versionDatasetSchema	= 1;
 	private static final int		versionRESTAPI			= 1;
 	private static final int		versionDHTAPI			= 1;
@@ -83,6 +85,10 @@ public class Config
 	
 	public void setPortREST(int portREST) {
 		this.portREST = portREST;
+	}
+	
+	public int getPortDHT() {
+		return portDHT;
 	}
 	
 	/**
