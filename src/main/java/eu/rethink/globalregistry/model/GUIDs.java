@@ -1,10 +1,12 @@
-package globalregistry.model;
+package eu.rethink.globalregistry.model;
 
-import globalregistry.util.ECDSAKeyPairManager;
 import io.jsonwebtoken.impl.Base64UrlCodec;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 

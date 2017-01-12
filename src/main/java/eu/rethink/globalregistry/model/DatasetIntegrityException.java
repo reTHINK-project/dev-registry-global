@@ -1,4 +1,4 @@
-package globalregistry.model;
+package eu.rethink.globalregistry.model;
 
 /**
  * Created by Half-Blood on 1/4/2017.

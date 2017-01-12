@@ -1,8 +1,9 @@
-package globalregistry;
+package eu.rethink.globalregistry;
 
-import globalregistry.configuration.Config;
-import globalregistry.dht.DHTManager;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import eu.rethink.globalregistry.configuration.Config;
+import eu.rethink.globalregistry.dht.DHTManager;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -131,8 +132,8 @@ public class GlobalRegistryServer implements Daemon
 		
 			LOGGER.info("initializing Global Registry server... ");
 			
-			//JettyServer.start();
-			System.getProperties().put("server.port", 5002); //<-- what was that!?
+			// Registering the port for the REST interface to listen on 
+			System.getProperties().put("server.port", 5002);
 			SpringApplication.run(GlobalRegistryServer.class, args);
 		}
 		catch (Exception e)

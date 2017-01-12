@@ -1,4 +1,4 @@
-package globalregistry.util;
+package eu.rethink.globalregistry.util;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

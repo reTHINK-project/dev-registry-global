@@ -1,10 +1,5 @@
-package globalregistry.test;
+package eu.rethink.globalregistry.test;
 
-import globalregistry.model.Dataset;
-import globalregistry.model.DatasetIntegrityException;
-import globalregistry.model.GUIDs;
-import globalregistry.util.ECDSAKeyPairManager;
-import globalregistry.util.XSDDateTime;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
@@ -13,6 +8,12 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import eu.rethink.globalregistry.model.Dataset;
+import eu.rethink.globalregistry.model.DatasetIntegrityException;
+import eu.rethink.globalregistry.model.GUIDs;
+import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
+import eu.rethink.globalregistry.util.XSDDateTime;
 
 import java.io.File;
 import java.io.IOException;

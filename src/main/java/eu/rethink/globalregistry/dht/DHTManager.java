@@ -1,6 +1,5 @@
-package globalregistry.dht;
+package eu.rethink.globalregistry.dht;
 
-import globalregistry.configuration.Config;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.dht.FutureGet;
 import net.tomp2p.dht.FuturePut;
@@ -15,6 +14,8 @@ import net.tomp2p.replication.IndirectReplication;
 import net.tomp2p.storage.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import eu.rethink.globalregistry.configuration.Config;
 
 import java.io.IOException;
 import java.net.Inet4Address;

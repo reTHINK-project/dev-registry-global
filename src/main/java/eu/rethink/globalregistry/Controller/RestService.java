@@ -1,12 +1,5 @@
-package globalregistry.Controller;
+package eu.rethink.globalregistry.Controller;
 
-import globalregistry.configuration.Config;
-import globalregistry.dht.DHTManager;
-import globalregistry.model.Dataset;
-import globalregistry.model.DatasetIntegrityException;
-import globalregistry.model.GUIDs;
-import globalregistry.util.ECDSAKeyPairManager;
-import globalregistry.util.IntegrityException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -22,6 +15,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import eu.rethink.globalregistry.configuration.Config;
+import eu.rethink.globalregistry.dht.DHTManager;
+import eu.rethink.globalregistry.model.Dataset;
+import eu.rethink.globalregistry.model.DatasetIntegrityException;
+import eu.rethink.globalregistry.model.GUIDs;
+import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
+import eu.rethink.globalregistry.util.IntegrityException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

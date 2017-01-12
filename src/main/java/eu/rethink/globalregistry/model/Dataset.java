@@ -1,4 +1,4 @@
-package globalregistry.model;
+package eu.rethink.globalregistry.model;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

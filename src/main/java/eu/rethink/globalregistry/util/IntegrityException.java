@@ -1,4 +1,4 @@
-package globalregistry.util;
+package eu.rethink.globalregistry.util;
 
 /**
  * Created by Half-Blood on 1/4/2017.

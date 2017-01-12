@@ -1,4 +1,4 @@
-package globalregistry.util;
+package eu.rethink.globalregistry.util;
 
 import io.jsonwebtoken.impl.Base64Codec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

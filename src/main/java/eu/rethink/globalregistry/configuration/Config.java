@@ -1,4 +1,4 @@
-package globalregistry.configuration;
+package eu.rethink.globalregistry.configuration;
 
 /**
  * Configuration class of the GlobalRegistry. Using singleton pattern.
