@@ -158,12 +158,12 @@ The dataset is expected to be a valid JSON Object of the following form:
 			},
 			"required": ["voice", "chat", "video"]
 		},
-		"legacy": {
+		"legacyIDs": {
 			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
-					"legacyType": {
+					"type": {
 						"type": "string"
 					},
 					"category": {
@@ -176,7 +176,7 @@ The dataset is expected to be a valid JSON Object of the following form:
 						"type": "string"
 					}
 				},
-				"required": ["legacyType", "category", "id"]
+				"required": ["type", "category", "id"]
 			}
 		}
 	},
@@ -208,8 +208,8 @@ The dataset is expected to be a valid JSON Object of the following form:
     "chat": "b",
     "video": "c"
   },
-  "legacy": [{
-    "legacyType": "email",
+  "legacyIDs": [{
+    "type": "email",
     "category": "work",
     "description": "my primary work email address",
     "id": "fluffy@googlemail.com"
