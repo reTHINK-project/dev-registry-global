@@ -6,6 +6,11 @@ default branch is now `tmp_master`
 
 ## Changelog
 
+### 0.3.0
+
+- migrated to SpringBoot framework
+- 
+
 ### 0.2.5
 
 - finalized implementation of changes to dataset and schema
@@ -76,7 +81,7 @@ Gets the dataset (a signed JWT) for the given GUID
 
 ### PUT /guid/{guid}
 
-Writes (creates and updates) a dataset (a signed JWT) for the given GUID
+Writes (creates and updates) a dataset (a signed JWT) for the given GUID. PLEASE NOTE THAT THE BODY OF THE HTTP REQUEST IS THE JWT IN PLAIN TEXT, NOT AS ANAMED PARAMETER!
 
 #### Example: 
 
@@ -152,6 +157,27 @@ The dataset is expected to be a valid JSON Object of the following form:
 				}
 			},
 			"required": ["voice", "chat", "video"]
+		},
+		"legacy": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"legacyType": {
+						"type": "string"
+					},
+					"category": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": ["legacyType", "category", "id"]
+			}
 		}
 	},
 	"required": ["guid", "userIDs", "lastUpdate", "timeout", "publicKey", "salt", "active", "revoked", "defaults"]
@@ -181,7 +207,13 @@ The dataset is expected to be a valid JSON Object of the following form:
     "voice": "a",
     "chat": "b",
     "video": "c"
-  }
+  },
+  "legacy": [{
+    "legacyType": "email",
+    "category": "work",
+    "description": "my primary work email address",
+    "id": "fluffy@googlemail.com"
+  }]
 }
 ```
 
@@ -212,17 +244,14 @@ GUIDs can be created with the following algorithm:
 
 ## config
 
-#### port for the REST interface of GReg
-port_server=5002
+Configuration of the GReg has changed starting with version 0.3.0. No config file is required, but the following parameters can be passed at startup:
 
-#### list of known hosts running a greg daemon. MUST be a valid and running host
-known_hosts=130.149.22.133
+-p --port_rest (default "5002")
+-n --network_interface (default "eth0")
+-n --connect_node (default "130.149.22.133")
+-l --log_path (default "logs")
 
-#### network interface to use
-network_interface=eth0
-
-#### path for the log files
-log_path=/usr/local/gReg/logs
+If the parameters are not passed at startup, the instance runs on the default values.
 
 ## DatasetTool
 
