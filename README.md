@@ -9,7 +9,7 @@ default branch is now `tmp_master`
 ### 0.3.0
 
 - migrated to SpringBoot framework
-- 
+- added support for legacy ids in the dataset
 
 ### 0.2.5
 
