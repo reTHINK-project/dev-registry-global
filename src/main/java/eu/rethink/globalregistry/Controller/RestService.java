@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import eu.rethink.globalregistry.configuration.Config;
 import eu.rethink.globalregistry.dht.DHTManager;
+import eu.rethink.globalregistry.dht.GUIDNotFoundException;
 import eu.rethink.globalregistry.model.Dataset;
 import eu.rethink.globalregistry.model.DatasetIntegrityException;
 import eu.rethink.globalregistry.model.GUIDs;
@@ -83,6 +84,7 @@ public class RestService
 		
 		if(GUID == null)
 		{
+			// received get request for path /guid/, but no guid.
 			JSONObject response = new JSONObject();
 			
 			response.put("Code", 400);
@@ -94,20 +96,36 @@ public class RestService
 		}
 		else //if(GUID != null)
 		{
-			String jwt = "";
+			String jwt = null;
 			
 			try
 			{
 				// get JWT from DHT
-				jwt = DHTManager.getInstance().get(GUID);
-				
-				if(jwt == null)
+				try
 				{
+					jwt = DHTManager.getInstance().get(GUID);
+				}
+				catch (GUIDNotFoundException e)
+				{
+					// tried to get dataset from dht, caught an exception
 					JSONObject response = new JSONObject();
 					
 					response.put("Code", 404);
 					response.put("Description", "Not found");
 					response.put("Explanation", "GUID not found");
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.NOT_FOUND);
+				}
+				
+				if(jwt == null)
+				{
+					// tried to get dataset from dht, found null. this should NEVER happen!
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 404);
+					response.put("Description", "Not found");
+					response.put("Explanation", "GUID not found. DHT returned NULL.");
 					response.put("Value", "");
 					
 					return new ResponseEntity<String>(response.toString(), HttpStatus.NOT_FOUND);
@@ -127,6 +145,7 @@ public class RestService
 					}
 					catch (DatasetIntegrityException e)
 					{
+						// read jwt from dht, integrity check for the enclosed json failed
 						LOGGER.error("Integrity Exception found for JWT: " + jwt + " e: " + e.getMessage());
 						
 						JSONObject response = new JSONObject();
@@ -148,6 +167,7 @@ public class RestService
 					}
 					catch (InvalidKeySpecException | NoSuchAlgorithmException e)
 					{
+						// got jwt from dht, tried to extract public key, failed while doing so
 						LOGGER.error("Malformed public key found in DHT: " + jwt + " e: " + e.getMessage());
 						
 						JSONObject response = new JSONObject();
@@ -167,6 +187,7 @@ public class RestService
 					}
 					catch (MalformedJwtException | UnsupportedJwtException e)
 					{
+						// got jwt from dht, jwt seems to be malformed
 						LOGGER.error("Malformed JWT found in DHT: " + jwt + " e: " + e.getMessage());
 						
 						JSONObject response = new JSONObject();
@@ -180,6 +201,7 @@ public class RestService
 					}
 					catch (SignatureException e)
 					{
+						// got jwt from dht, jwt signature check failed
 						LOGGER.error("Malformed JWT found in DHT: " + jwt + e.getMessage());
 						
 						JSONObject response = new JSONObject();
@@ -205,6 +227,7 @@ public class RestService
 			}
 			catch(JSONException e)
 			{
+				// somewhere, a json exception was thrown
 				LOGGER.error("Faulty JSON data in DHT: " + jwt + " e: " + e.getMessage());
 				
 				JSONObject response = new JSONObject();
@@ -218,6 +241,7 @@ public class RestService
 			}
 			catch (IOException | ClassNotFoundException e)
 			{
+				// somewhere, a more severe exception was thrown
 				LOGGER.error("Internal Server Error: " + jwt + " e: "+ e.getMessage());
 				
 				JSONObject response = new JSONObject();
@@ -232,114 +256,317 @@ public class RestService
 		}
 	}
 	
-    @RequestMapping(value = "guid/{GUID}", method = RequestMethod.PUT)
-    public ResponseEntity<String> putdata(@RequestBody String jwt, @PathVariable("GUID") String GUID ){
-        LOGGER.info("PUT Request received: " + jwt);
-        JSONObject data; // the new version of the jwt
-        JSONObject existingData; // the already existing version (if there is
-        // any)
-        String guidFromDataset; // the guid of the jwt
-
-        PublicKey publicKey; // the public key of the NEW version
-        JSONObject response = new JSONObject();
-        try{
-            // verification of passed JWT
-            // get payload from jwt
-            JSONObject jwtHeader = new JSONObject(
-                    new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[0])));
-            LOGGER.info("header: " + jwtHeader.toString());
-
-            // step by step:
-            JSONObject jwtPayload = new JSONObject(
-                    new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[1])));
-            LOGGER.info("payload: " + jwtPayload.toString());
-
-            // the data claim is a base64url-encoded json object
-            data = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayload.get("data").toString()));
-            LOGGER.info("decoded payload: " + data.toString());
-            Dataset.checkDatasetValidity(data);
-
-            // extract public key for signature verification
-            publicKey = ECDSAKeyPairManager.decodePublicKey(data.getString("publicKey"));
-            // TODO build key from string
-
-            // verify jwt
-            Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);
-            LOGGER.info("token verified");
-
-            // verify GUID
-            if (!data.getString("guid").equals(GUIDs.createGUID(data.getString("publicKey"), data.getString("salt"))))
-                throw new IntegrityException("GUID is invalid!");
-
-            // get the already existing jwt from the DHT
-            if (!GUID.equals(data.getString("guid")))
-                throw new IntegrityException("GUID mismatch!");
-
-
-            // TODO verify data of jwt claim
-
-            // if no exception has been thrown until here, the jwt signature has
-            // been verified
-
-            // verification of JWT claim "data"
-
-            // check for an already existing jwt in the DHT
-
-            String dhtResult = DHTManager.getInstance().get(GUID);
-
-            if(dhtResult != null){
-                // updating an existing dataset
-
-                JSONObject jwtPayloadFromDHT = new JSONObject(
-                        new String(Base64UrlCodec.BASE64URL.decodeToString(dhtResult.split("\\.")[1])));
-
-                existingData = new JSONObject(
-                        Base64UrlCodec.BASE64URL.decodeToString(jwtPayloadFromDHT.get("data").toString()));
-
-
-                // TODO also check the validity of THIS jwt and payload!
-
-                // verify that GUIDs are matching
-                if (!data.getString("guid").equals(existingData.getString("guid")))
-                    throw new IntegrityException("GUIDs are not matching!");
-                LOGGER.info("Dataset for [" + GUID + "] updated: \n" + jwt);
-                DHTManager.getInstance().put(GUID, jwt);
-                response.put("Code", 200);
-                response.put("Description", "OK");
-                response.put("Value", "");
-                return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
-            }
-            else{
-                // writing a new dataset
-
-                // in this case, there is no dataset for this GUID in the DHT
-                DHTManager.getInstance().put(GUID, jwt);
-                LOGGER.info("Dataset for [" + GUID + "] written to DHT: \n" + jwt);
-                response.put("Code", 200);
-                response.put("Description", "OK");
-                response.put("Value", "");
-
-                return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
-            }
-        } catch (UnsupportedJwtException | MalformedJwtException e) {
-            LOGGER.error("Malformed JWT Exception: " + e.getMessage() + "\n" + e);
-            response.put("Code", 400);
-            response.put("Description", "Invalid request");
-            response.put("Value", "");
-            return new ResponseEntity<String>(response.toString(), HttpStatus.NOT_FOUND);
-        } catch (IntegrityException | DatasetIntegrityException | ClassNotFoundException | IOException e) {
-            LOGGER.error("Integrity Exception: " + e.getMessage() + "\n" + e);
-            response.put("Code", 400);
-            response.put("Description", "Invalid request");
-            response.put("Value", "");
-            return new ResponseEntity<String>(response.toString(), HttpStatus.NOT_FOUND);
-        } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            LOGGER.error("Error while putting data into DHT: " + e.getMessage() + "\n" + e);
-            response.put("Code", 500);
-            response.put("Description", "Internal server error");
-            response.put("Value", "");
-            return new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
-        }
-    }
+	@RequestMapping(value = "guid/{GUID}", method = RequestMethod.PUT)
+	public ResponseEntity<String> putdata(@RequestBody String jwt, @PathVariable("GUID") String GUID)
+	{
+		LOGGER.error("Incoming request: PUT /guid/" + GUID + " - JWT: " + jwt);
+		
+		JSONObject newData; // the new version of the jwt
+		JSONObject existingData; // the already existing version (if there is any)
+		String guidFromDataset; // the guid of the jwt
+		
+		PublicKey newDatasetPublicKey; // the public key of the NEW version
+		
+		try
+		{
+			// decode JWT
+			JSONObject jwtPayload = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[1])));
+			newData = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayload.get("data").toString()));
+			
+			//LOGGER.info("decoded JWT payload: " + newData.toString());
+			
+			// verify dataset integrity
+			try
+			{
+				Dataset.checkDatasetValidity(newData);
+			}
+			catch (DatasetIntegrityException e)
+			{
+				LOGGER.error("Integrity Exception found for received JWT: " + jwt + " e: " + e.getMessage());
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 400);
+				response.put("Description", "Bad Request");
+				response.put("Explanation", "JWT is malformed: " + jwt + " e: " + e.getMessage());
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
+			}
+			
+			// decode key
+			try
+			{
+				newDatasetPublicKey = ECDSAKeyPairManager.decodePublicKey(newData.getString("publicKey"));
+			}
+			catch (InvalidKeySpecException | NoSuchAlgorithmException e)
+			{
+				LOGGER.error("Malformed public key found in JWT: " + jwt + " e: " + e.getMessage());
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 400);
+				response.put("Description", "Bad Request");
+				response.put("Explanation", "Malformed public key found in JWT: " + jwt + " e: " + e.getMessage());
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
+			}
+			
+			// verify jwt
+			try
+			{
+				Jwts.parser().setSigningKey(newDatasetPublicKey).parseClaimsJws(jwt);
+			}
+			catch (MalformedJwtException | UnsupportedJwtException e)
+			{
+				LOGGER.error("Malformed JWT found in DHT: " + jwt + " e: " + e.getMessage());
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 400);
+				response.put("Description", "Bad Request");
+				response.put("Explanation", "Malformed JWT: " + jwt + " e: " + e.getMessage());
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
+			}
+			catch (SignatureException e)
+			{
+				LOGGER.error("Malformed JWT found in DHT: " + jwt + e.getMessage());
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 400);
+				response.put("Description", "Bad Request");
+				response.put("Explanation", "Malformed signature for JWT: " + jwt + " e: " + e.getMessage());
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
+			}
+			
+			LOGGER.info("JWT for GUID " + GUID + " verified");
+			
+			// match new JWT to existing JWT
+			String existingJWT = null;
+			
+			try
+			{
+				existingJWT = DHTManager.getInstance().get(GUID);
+				
+				// GUID found. Ergo, we are updating an existing dataset
+				
+				JSONObject jwtPayloadFromDHT = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(existingJWT.split("\\.")[1])));
+				existingData = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayloadFromDHT.get("data").toString()));
+				//---
+				
+				// verify the existing dataset's integrity
+				try
+				{
+					Dataset.checkDatasetValidity(existingData);
+				}
+				catch (DatasetIntegrityException e)
+				{
+					// tried to write dataset. found an existing one. the existing one failed the integrity test
+					LOGGER.error("Integrity exception found for existing dataset: " + existingJWT + " e: " + e.getMessage());
+					
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 500);
+					response.put("Description", "Internal Server Error");
+					response.put("Explanation", "Malformed JWT found in DHT: " + existingJWT + " e: " + e.getMessage());
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				
+				// decode key
+				PublicKey existingDatasetPublicKey;
+				
+				try
+				{
+					existingDatasetPublicKey = ECDSAKeyPairManager.decodePublicKey(existingData.getString("publicKey"));
+				}
+				catch (InvalidKeySpecException | NoSuchAlgorithmException e)
+				{
+					// tried to write dataset. found an existing one. the public key of the existing one couldnt be extracted
+					LOGGER.error("Malformed public key found in DHT: " + jwt + " e: " + e.getMessage());
+					
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 500);
+					response.put("Description", "Internal Server Error");
+					response.put("Explanation", "Malformed public key found in DHT: " + jwt + " e: " + e.getMessage());
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				
+				// verify jwt
+				try
+				{
+					Jwts.parser().setSigningKey(existingDatasetPublicKey).parseClaimsJws(jwt);
+				}
+				catch (MalformedJwtException | UnsupportedJwtException e)
+				{
+					// tried to write dataset. found an existing one. the existing one seems to be malformed jwt
+					LOGGER.error("Malformed JWT found in DHT: " + jwt + " e: " + e.getMessage());
+					
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 500);
+					response.put("Description", "Internal Server Error");
+					response.put("Explanation", "Malformed JWT found in DHT: " + jwt + " e: " + e.getMessage());
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				catch (SignatureException e)
+				{
+					// tried to write dataset. found an existing one. the signature check of the existing one failed
+					LOGGER.error("Malformed JWT found in DHT: " + jwt + e.getMessage());
+					
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 500);
+					response.put("Description", "Internal Server Error");
+					response.put("Explanation", "Malformed signature for JWT found in DHT: " + jwt + " e: " + e.getMessage());
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				
+				try
+				{
+					// verify that GUIDs are matching
+					if(!newData.getString("guid").equals(existingData.getString("guid")))
+						throw new IntegrityException("GUIDs are not matching!");
+				}
+				catch (IntegrityException e)
+				{
+					// tried to write dataset, found an existing one. GUIDs do not match. Should NEVER happen!
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 400);
+					response.put("Description", "Bad Request");
+					response.put("Explanation", "GUIDs do not match: " + jwt + " e: " + e.getMessage());
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
+				}
+				
+				// everything is fine. overwrite existing dataset with new one
+				
+				LOGGER.info("Dataset for GUID " + GUID + " updated: \n" + jwt);
+				
+				try
+				{
+					DHTManager.getInstance().put(GUID, jwt);
+				}
+				catch (IOException e)
+				{
+					// tried to write dataset, found an existing one. Encountered an IO error while overwriting the existing one
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 500);
+					response.put("Description", "Internal Server Error");
+					response.put("Explanation", "Error while writing to DHT: " + jwt + " e: " + e.getMessage());
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				
+				LOGGER.info("Dataset for [" + GUID + "] written to DHT: \n" + jwt);
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 200);
+				response.put("Description", "OK");
+				response.put("Explanation", "Dataset for GUID " + GUID + " updated: " + jwt);
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
+			}
+			catch (GUIDNotFoundException e)
+			{
+				// GUID not found. Ergo, we are writing a new dataset to the DHT
+				
+				// TODO try/catch with error handling here!
+				try
+				{
+					DHTManager.getInstance().put(GUID, jwt);
+				}
+				catch (IOException e1)
+				{
+					// tried to write dataset, found an existing one. Encountered an IO error while overwriting the existing one
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 500);
+					response.put("Description", "Internal Server Error");
+					response.put("Explanation", "Error while writing to DHT: " + jwt + " e: " + e1.getMessage());
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				
+				LOGGER.info("Dataset for [" + GUID + "] written to DHT: \n" + jwt);
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 200);
+				response.put("Description", "OK");
+				response.put("Explanation", "Dataset for GUID " + GUID + " written to DHT: \n" + jwt);
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
+			}
+		}
+		catch(JSONException e)
+		{
+			// somewhere, a json exception was thrown
+			LOGGER.error("Faulty JSON data in DHT: " + jwt + " e: " + e.getMessage());
+			
+			JSONObject response = new JSONObject();
+			
+			response.put("Code", 500);
+			response.put("Description", "Internal Server Error");
+			response.put("Explanation", "Faulty JSON data in DHT: " + jwt + " e: " + e.getMessage());
+			response.put("Value", "");
+			
+			return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		catch (IOException | ClassNotFoundException e)
+		{
+			// somewhere, a more severe exception was thrown
+			LOGGER.error("Internal Server Error: " + jwt + " e: "+ e.getMessage());
+			
+			JSONObject response = new JSONObject();
+			
+			response.put("Code", 500);
+			response.put("Description", "Internal server error");
+			response.put("Explanation", "Internal Server Error: " + jwt + " e: " + e.getMessage());
+			response.put("Value", "");
+			
+			return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	/**
+	 * Easteregg. Just returning "I'm a teapot" as of RFC #2324
+	 * 
+	 */
+	@RequestMapping(value = "teapot", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> teapot() throws URISyntaxException
+	{
+		LOGGER.error("Incomin request: GET /2324");
+		
+		JSONObject response = new JSONObject();
+		
+		response.put("Code", 418);
+		response.put("Description", "I'm a teapot");
+		response.put("Value", "See RFC #2324");
+		
+		return new ResponseEntity<String>(response.toString(), HttpStatus.I_AM_A_TEAPOT);
+		
+	}
 }
-
