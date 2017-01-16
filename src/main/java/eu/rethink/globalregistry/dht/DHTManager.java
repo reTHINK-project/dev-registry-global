@@ -74,8 +74,9 @@ public class DHTManager
 	 * @return the social record
 	 * @throws ClassNotFoundException
 	 * @throws IOException
+	 * @throws GUIDNotFoundException 
 	 */
-	public String get(String key) throws ClassNotFoundException, IOException
+	public String get(String key) throws ClassNotFoundException, IOException, GUIDNotFoundException
 	{
 		FutureGet futureGet = peer.get(Number160.createHash(key)).start();
 		futureGet.awaitUninterruptibly();
@@ -85,8 +86,12 @@ public class DHTManager
 		{
 			return futureGet.data().object().toString();
 		}
+		else
+		{
+			throw new GUIDNotFoundException("");
+		}
 		
-		return null; // TODO: decide on sentinel value
+		//return null; // TODO: decide on sentinel value
 	}
 	
 	/**
@@ -102,6 +107,11 @@ public class DHTManager
 	{
 		FuturePut futurePut = peer.put(Number160.createHash(key)).data(new Data(value)).start();
 		futurePut.awaitUninterruptibly();
+		
+		if(futurePut.isSuccess())
+		{
+			
+		}
 		// TODO: use non-blocking?
 	}
 	
