@@ -2,6 +2,7 @@ package eu.rethink.globalregistry.Controller;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.impl.Base64UrlCodec;
 import net.tomp2p.peers.PeerAddress;
@@ -32,81 +33,205 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 /**
- * Created by Half-Blood on 1/4/2017.
+ * Main class for GlobalRegistry daemon
+ * 
+ * @date 16.01.2017
+ * @version 1
+ * @author Sebastian Göndör, Parth Singh
  */
 @RestController
 @RequestMapping("/")
-public class RestService {
-
-    @Autowired
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestService.class);
-
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> index() throws URISyntaxException {
-        // TODO multiple requests in one?
-        LOGGER.error("GET Request without GUID received");
-        List<PeerAddress> AllNeighbors = DHTManager.getInstance().getAllNeighbors();
-
-        JSONArray connectedNodes = new JSONArray();
-
-        for (PeerAddress neighbor : AllNeighbors) {
-            connectedNodes.put(neighbor.inetAddress().getHostAddress());
-        }
-
-        JSONObject version = new JSONObject();
-        version.put("version", Config.getInstance().getVersionName());
-        version.put("build", Config.getInstance().getVersionNumber());
-
-        JSONObject response = new JSONObject();
-        response.put("Code", 200);
-        response.put("Description", "OK");
-        response.put("Value", "");
-        response.put("version", version);
-        response.put("connectedNodes", connectedNodes);
-
-        return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
-
-    }
-
-
-    //STATUS: Index Function is working absolutely fine.
-
-
-    @RequestMapping(value = "guid/{GUID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<String> getEntitybyGUID(@PathVariable("GUID") String GUID){
-        LOGGER.info("GET Request received for GUID " + GUID);
-        JSONObject response = new JSONObject();
-        ResponseEntity<String> finalresponse;
-        response.put("Code", 404);
-        response.put("Description", "GUID not found");
-        response.put("Value", "");
-        finalresponse = new ResponseEntity<String>(response.toString(), HttpStatus.NOT_FOUND);
-        if(GUID != null){
-            try{
-                String jwt = DHTManager.getInstance().get(GUID);
-                if(jwt != null) {
-                    try{
-                        response.put("Code", 200);
-                        response.put("Description", "OK");
-                        response.put("Value", jwt);
-                        finalresponse = new ResponseEntity<String>(response.toString(), HttpStatus.OK);
-                    }catch(JSONException e){
-                        LOGGER.error("Faulty data in DHT! This should not happen! " + e.getMessage());
-                    }
-                }
-
-            }catch (IOException | ClassNotFoundException e){
-                LOGGER.error("Error while getting data from DHT: " + e.getMessage());
-                response.put("Code", 500);
-                response.put("Description", "Internal server error");
-                response.put("Value", "");
-                finalresponse = new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
-            }
-        }
-        return finalresponse ;
-    }
-
+public class RestService
+{
+	@Autowired
+	private static final Logger LOGGER = LoggerFactory.getLogger(RestService.class);
+	
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> index() throws URISyntaxException
+	{
+		LOGGER.error("Incomin request: GET /");
+		List<PeerAddress> AllNeighbors = DHTManager.getInstance().getAllNeighbors();
+		
+		JSONArray connectedNodes = new JSONArray();
+		
+		for (PeerAddress neighbor : AllNeighbors) {
+			connectedNodes.put(neighbor.inetAddress().getHostAddress());
+		}
+		
+		JSONObject version = new JSONObject();
+		version.put("version", Config.getInstance().getVersionName());
+		version.put("build", Config.getInstance().getVersionNumber());
+		
+		JSONObject response = new JSONObject();
+		response.put("Code", 200);
+		response.put("Description", "OK");
+		response.put("Value", "");
+		response.put("version", version);
+		response.put("connectedNodes", connectedNodes);
+		
+		return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
+		
+	}
+	
+	//STATUS: Index Function is working absolutely fine.
+	
+	@RequestMapping(value = "guid/{GUID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<String> getEntitybyGUID(@PathVariable("GUID") String GUID)
+	{
+		LOGGER.error("Incoming request: GET /guid/" + GUID);
+		
+		if(GUID == null)
+		{
+			JSONObject response = new JSONObject();
+			
+			response.put("Code", 400);
+			response.put("Description", "Bad Request");
+			response.put("Explanation", "GUID not specified in request URL");
+			response.put("Value", "");
+			
+			return new ResponseEntity<String>(response.toString(), HttpStatus.BAD_REQUEST);
+		}
+		else //if(GUID != null)
+		{
+			String jwt = "";
+			
+			try
+			{
+				// get JWT from DHT
+				jwt = DHTManager.getInstance().get(GUID);
+				
+				if(jwt == null)
+				{
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 404);
+					response.put("Description", "Not found");
+					response.put("Explanation", "GUID not found");
+					response.put("Value", "");
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.NOT_FOUND);
+				}
+				else //if(jwt != null)
+				{
+					// decode JWT
+					JSONObject jwtPayload = new JSONObject(new String(Base64UrlCodec.BASE64URL.decodeToString(jwt.split("\\.")[1])));
+					JSONObject data = new JSONObject(Base64UrlCodec.BASE64URL.decodeToString(jwtPayload.get("data").toString()));
+					
+					LOGGER.info("decoded JWT payload: " + data.toString());
+					
+					// verify dataset integrity
+					try
+					{
+						Dataset.checkDatasetValidity(data);
+					}
+					catch (DatasetIntegrityException e)
+					{
+						LOGGER.error("Integrity Exception found for JWT: " + jwt + " e: " + e.getMessage());
+						
+						JSONObject response = new JSONObject();
+						
+						response.put("Code", 500);
+						response.put("Description", "Internal Server Error");
+						response.put("Explanation", "Malformed JWT found in DHT: " + jwt + " e: " + e.getMessage());
+						response.put("Value", "");
+						
+						return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+					
+					// decode key
+					PublicKey publicKey;
+					
+					try
+					{
+						publicKey = ECDSAKeyPairManager.decodePublicKey(data.getString("publicKey"));
+					}
+					catch (InvalidKeySpecException | NoSuchAlgorithmException e)
+					{
+						LOGGER.error("Malformed public key found in DHT: " + jwt + " e: " + e.getMessage());
+						
+						JSONObject response = new JSONObject();
+						
+						response.put("Code", 500);
+						response.put("Description", "Internal Server Error");
+						response.put("Explanation", "Malformed public key found in DHT: " + jwt + " e: " + e.getMessage());
+						response.put("Value", "");
+						
+						return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+					
+					// verify jwt
+					try
+					{
+						Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt);
+					}
+					catch (MalformedJwtException | UnsupportedJwtException e)
+					{
+						LOGGER.error("Malformed JWT found in DHT: " + jwt + " e: " + e.getMessage());
+						
+						JSONObject response = new JSONObject();
+						
+						response.put("Code", 500);
+						response.put("Description", "Internal Server Error");
+						response.put("Explanation", "Malformed JWT found in DHT: " + jwt + " e: " + e.getMessage());
+						response.put("Value", "");
+						
+						return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+					catch (SignatureException e)
+					{
+						LOGGER.error("Malformed JWT found in DHT: " + jwt + e.getMessage());
+						
+						JSONObject response = new JSONObject();
+						
+						response.put("Code", 500);
+						response.put("Description", "Internal Server Error");
+						response.put("Explanation", "Malformed signature for JWT found in DHT: " + jwt + " e: " + e.getMessage());
+						response.put("Value", "");
+						
+						return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+					
+					LOGGER.info("JWT for GUID " + GUID + " verified");
+					
+					JSONObject response = new JSONObject();
+					
+					response.put("Code", 200);
+					response.put("Description", "OK");
+					response.put("Value", jwt);
+					
+					return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
+				}
+			}
+			catch(JSONException e)
+			{
+				LOGGER.error("Faulty JSON data in DHT: " + jwt + " e: " + e.getMessage());
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 500);
+				response.put("Description", "Internal Server Error");
+				response.put("Explanation", "Faulty JSON data in DHT: " + jwt + " e: " + e.getMessage());
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			catch (IOException | ClassNotFoundException e)
+			{
+				LOGGER.error("Internal Server Error: " + jwt + " e: "+ e.getMessage());
+				
+				JSONObject response = new JSONObject();
+				
+				response.put("Code", 500);
+				response.put("Description", "Internal server error");
+				response.put("Explanation", "Internal Server Error: " + jwt + " e: " + e.getMessage());
+				response.put("Value", "");
+				
+				return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+	}
+	
     @RequestMapping(value = "guid/{GUID}", method = RequestMethod.PUT)
     public ResponseEntity<String> putdata(@RequestBody String jwt, @PathVariable("GUID") String GUID ){
         LOGGER.info("PUT Request received: " + jwt);
