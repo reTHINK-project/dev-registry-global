@@ -4,21 +4,21 @@ package eu.rethink.globalregistry.configuration;
  * Configuration class of the GlobalRegistry. Using singleton pattern.
  * 
  * @author Sebastian Göndör
- * @version 1
- * @date 10.01.2017
+ * @version 2
+ * @date 17.01.2017
  */
 public class Config
 {
 	private static Config _singleton = null;
 
 	private static final String		versionName				= "0.3.0";
-	private static final int		versionNumber			= 1400;
+	private static final int		versionNumber			= 1405;
 	private static final String		versionCode				= "springified";
-	private static final String		versionDate				= "2017-01-10";
+	private static final String		versionDate				= "2017-01-17";
 	private static final String		productName				= "reTHINK Global Registry";
 	private static final String		productNameShort		= "gReg";
 
-	private static final int		portDHT					= 5001;
+	private static final int		portDHT					= 6001;
 	private static final int		versionDatasetSchema	= 1;
 	private static final int		versionRESTAPI			= 1;
 	private static final int		versionDHTAPI			= 1;
@@ -26,7 +26,7 @@ public class Config
 	private static final String		networkInterfaceDefault	= "eth0";
 	private static final String		logPathDefault			= "logs";
 	private static final String		connectNodeDefault		= "130.149.22.133";
-	private static final int		portRESTDefault			= 5002;
+	private static final int		portRESTDefault			= 6002;
 
 	private String networkInterface;
 	private String logPath;
