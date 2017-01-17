@@ -100,23 +100,20 @@ public class GlobalRegistryServer implements Daemon
 				config.setConnectNode(cmd.getOptionValue("c")); // TODO check for valid values
 			}
 			
-			System.out.println("\n-----Configuration: ");
+			System.out.println("-----Configuration: ");
 			System.out.println("connectNode: " + config.getConnectNode());
 			System.out.println("portREST: " + config.getPortREST());
 			System.out.println("networkInterface: " + config.getNetworkInterface());
 			System.out.println("logPath: " + config.getLogPath() + "\n-----");
 			
 			// setup logging
-			System.setProperty("loginfofile", Config.getInstance().getLogPath() + "log-info.log");
-			System.setProperty("logdebugfile", Config.getInstance().getLogPath() + "log-debug.log");
+			System.setProperty("loginfofile", config.getLogPath() + "log-info.log");
+			System.setProperty("logdebugfile", config.getLogPath() + "log-debug.log");
+			
 			LOGGER = LoggerFactory.getLogger(GlobalRegistryServer.class);
 			
-			LOGGER.info(Config.getInstance().getProductName() + " "
-					+ Config.getInstance().getVersionName() + " "
-					+ Config.getInstance().getVersionCode());
-			
-			LOGGER.info("Build #" + Config.getInstance().getVersionNumber() + " ("
-					+ Config.getInstance().getVersionDate() + ")\n");
+			LOGGER.info(config.getProductName() + " " + config.getVersionName() + " " + config.getVersionCode());
+			LOGGER.info("Build #" + config.getVersionNumber() + " (" + config.getVersionDate() + ")\n");
 		}
 		catch (ParseException e)
 		{
@@ -129,11 +126,13 @@ public class GlobalRegistryServer implements Daemon
 			
 			DHTManager.getInstance().initDHT();
 			LOGGER.info("DHT initialized successfully");
-		
+			
 			LOGGER.info("initializing Global Registry server... ");
 			
 			// Registering the port for the REST interface to listen on 
-			System.getProperties().put("server.port", 5002);
+			System.getProperties().put("server.port", config.getPortREST());
+			LOGGER.info("REST interface listening on  " + config.getPortREST());
+			
 			SpringApplication.run(GlobalRegistryServer.class, args);
 		}
 		catch (Exception e)
