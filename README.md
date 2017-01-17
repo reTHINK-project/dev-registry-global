@@ -8,19 +8,20 @@ default branch is now `tmp_master`
 
 ### 0.3.0
 
-- migrated to SpringBoot framework
+- migrated to SpringBoot framework v1.4.3
 - code cleanup
 - added support for legacy ids in the dataset
 - dataset integrity is now checked on GET requests too
 - added detailed explanations to HTTP responses
 - DatasetTool updated to v0.0.8
+- dockerization
 
 ### 0.2.5
 
 - finalized implementation of changes to dataset and schema
 - added "schemaVersion" to dataset
 - DatasetTool updated
-- Responses now use HTTP response codes
+- responses now use HTTP response codes
 
 ### 0.2.2
 
@@ -44,11 +45,11 @@ default branch is now `tmp_master`
 
 ### 0.1.1
 
-- Status window now shows connected nodes
+- status window now shows connected nodes
 - TomP2P 5.0 beta8
-- Updated libraries (Jetty/Netty/etc)
-- Code cleaned up
-- Additional tests for JWT/Dataset validation
+- updated libraries (Jetty/Netty/etc)
+- code cleaned up
+- additional tests for JWT/Dataset validation
 
 ### 0.1.0
 
@@ -235,7 +236,7 @@ The Dataset is transferred as a JWT as a claim identified by "data". The JWT MUS
 
 see also: https://github.com/reTHINK-project/dev-registry-global/wiki/Test-dataset-jwt-creation-verification
 
-## GUID
+### GUID
 
 GUIDs can be created with the following algorithm: 
 
@@ -245,6 +246,16 @@ GUIDs can be created with the following algorithm:
 - get a string to be used as a salt
 - perform PKDF2 with SHA256 with 10000 iterations on the public key, using the salt
 - encode the result in Base64url. This is the GUID
+
+## Docker
+
+Create the Docker image by running
+
+```docker build .```
+
+then start the container via
+
+```docker run -p 5001:5001 -p 5002:5002 CONTAINERNAME```
 
 ## config
 
