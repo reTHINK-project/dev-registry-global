@@ -543,8 +543,8 @@ public class DatasetTool
 			System.out.print("illegal parameter!\n");
 			
 			//////////////////////////////////////////////////
-				// TODO implement this for edit		
-//			JSONArray legacyIDs = new JSONArray();
+// TODO implement this for edit		
+			JSONArray legacyIDs = new JSONArray();
 //			
 //			System.out.print("add legacyID? (y|n) [n]: \n");
 //			String inAddLegacyID = in.nextLine();
@@ -589,6 +589,7 @@ public class DatasetTool
 			jsonDataset.put("active", active);
 			jsonDataset.put("revoked", revoked);
 			jsonDataset.put("guid", oldDataset.getGUID());
+			jsonDataset.put("legacyIDs", legacyIDs);
 			
 			return jsonDataset;
 		}
@@ -821,6 +822,7 @@ public class DatasetTool
 			jsonDataset.put("revoked", revoked);
 			jsonDataset.put("guid", GUIDs.createGUID(publicKeyString, salt));
 			jsonDataset.put("defaults", defaults);
+			jsonDataset.put("legacyIDs", legacyIDs);
 			jsonDataset.put("schemaVersion", 1);
 			
 			JSONObject json = new JSONObject();
