@@ -9,7 +9,11 @@ default branch is now `tmp_master`
 ### 0.3.0
 
 - migrated to SpringBoot framework
+- code cleanup
 - added support for legacy ids in the dataset
+- dataset integrity is now checked on GET requests too
+- added detailed explanations to HTTP responses
+- DatasetTool updated to v0.0.8
 
 ### 0.2.5
 
