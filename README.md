@@ -15,6 +15,7 @@ default branch is now `master` again!
 - added detailed explanations to HTTP responses
 - DatasetTool updated to v0.0.8
 - dockerization
+- reworked service configuration
 
 ### 0.2.5
 
