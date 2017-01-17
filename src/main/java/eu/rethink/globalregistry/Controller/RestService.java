@@ -263,7 +263,6 @@ public class RestService
 		
 		JSONObject newData; // the new version of the jwt
 		JSONObject existingData; // the already existing version (if there is any)
-		String guidFromDataset; // the guid of the jwt
 		
 		PublicKey newDatasetPublicKey; // the public key of the NEW version
 		
@@ -558,7 +557,7 @@ public class RestService
 	@RequestMapping(value = "teapot", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> teapot() throws URISyntaxException
 	{
-		LOGGER.error("Incomin request: GET /2324");
+		LOGGER.error("Incomin request: GET /teapot");
 		
 		JSONObject response = new JSONObject();
 		
