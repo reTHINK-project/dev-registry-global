@@ -2,7 +2,7 @@
 Global Registry
 
 !!! WARNING !!!
-default branch is now `tmp_master`
+default branch is now `master` again!
 
 ## Changelog
 
