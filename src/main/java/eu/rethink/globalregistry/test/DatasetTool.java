@@ -849,7 +849,7 @@ public class DatasetTool
 		
 		try
 		{
-			Dataset.checkDatasetValidity(dataset.exportJSONObject());
+			dataset.validateSchema();
 			System.out.print("ok!\n");
 		}
 		catch (DatasetIntegrityException e)

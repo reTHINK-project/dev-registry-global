@@ -1,5 +1,12 @@
 package eu.rethink.globalregistry.model;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONTokener;
+import org.everit.json.schema.ValidationException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -178,36 +185,55 @@ public class Dataset
 		this.legacyIDs = legacyIDs;
 	}
 	
-	/* TODO this should be rewritten */
+	public boolean validateSchema() throws DatasetIntegrityException
+	{
+		try (InputStream inputStream = getClass().getResourceAsStream("schema.json"))
+		{
+				JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
+				Schema schema = SchemaLoader.load(rawSchema);
+				schema.validate(exportJSONObject());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ValidationException e)
+		{
+			throw new DatasetIntegrityException("Dataset does not validate against JSON Schema");
+		}
+		
+		return true;
+	}
+	
 	public static boolean checkDatasetValidity(JSONObject json) throws DatasetIntegrityException
 	{
 		if(!json.has("guid"))
-		throw new DatasetIntegrityException("mandatory parameter 'guid' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'guid' missing");
 		if(!json.has("schemaVersion"))
-		throw new DatasetIntegrityException("mandatory parameter 'schemaVersion' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'schemaVersion' missing");
 		
 		// TODO: userIDs are now objects. Rewrite check
 		if(!json.has("userIDs"))
-		throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");
 		if(!json.has("lastUpdate"))
-		throw new DatasetIntegrityException("mandatory parameter 'lastUpdate' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'lastUpdate' missing");
 		if(!json.has("timeout"))
-		throw new DatasetIntegrityException("mandatory parameter 'timeout' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'timeout' missing");
 		if(!json.has("publicKey"))
-		throw new DatasetIntegrityException("mandatory parameter 'publicKey' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'publicKey' missing");
 		if(!json.has("salt"))
-		throw new DatasetIntegrityException("mandatory parameter 'salt' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'salt' missing");
 		if(!json.has("revoked"))
-		throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
 		if(!json.has("defaults"))
-		throw new DatasetIntegrityException("mandatory parameter 'defaults' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'defaults' missing");
 		
 		if(!json.getJSONObject("defaults").has("voice"))
-		throw new DatasetIntegrityException("mandatory parameter 'defaults : voice' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'defaults : voice' missing");
 		if(!json.getJSONObject("defaults").has("chat"))
-		throw new DatasetIntegrityException("mandatory parameter 'defaults : chat' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'defaults : chat' missing");
 		if(!json.getJSONObject("defaults").has("video"))
-		throw new DatasetIntegrityException("mandatory parameter 'defaults : video' missing");
+			throw new DatasetIntegrityException("mandatory parameter 'defaults : video' missing");
 		// for unknown reasons, this fails always
 		/*if(json.getString("guid").equals(GUID.createGUID(json.getString("publicKey"), json.getString("salt"))))
 			throw new DatasetIntegrityException("guid does not match publicKey/salt: "+ json.getString("publicKey") + " :: " + json.getString("salt"));*/

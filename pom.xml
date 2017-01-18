@@ -31,6 +31,11 @@
 			<version>20160810</version><!-- <version>20140107</version> -->
 		</dependency>
 		<dependency>
+			<groupId>org.everit.json</groupId>
+			<artifactId>org.everit.json.schema</artifactId>
+			<version>1.4.1</version>
+		</dependency>
+		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.7.0</version><!-- <version>0.6.0</version> -->
