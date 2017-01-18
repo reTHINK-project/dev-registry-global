@@ -6,6 +6,10 @@ default branch is now `master` again!
 
 ## Changelog
 
+### 0.3.1
+
+- updated dependencies
+
 ### 0.3.0
 
 - migrated to SpringBoot framework v1.4.3
