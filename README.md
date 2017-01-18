@@ -9,7 +9,7 @@ default branch is now `master` again!
 ### 0.3.1
 
 - updated dependencies
-- 
+- dataset check via json schema
 
 ### 0.3.0
 
