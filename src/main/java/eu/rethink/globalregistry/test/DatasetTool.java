@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 import eu.rethink.globalregistry.model.Dataset;
 import eu.rethink.globalregistry.model.DatasetIntegrityException;
-import eu.rethink.globalregistry.model.GUIDs;
+import eu.rethink.globalregistry.model.GUID;
 import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.XSDDateTime;
 
@@ -820,7 +820,7 @@ public class DatasetTool
 			jsonDataset.put("publicKey", publicKeyString);
 			jsonDataset.put("active", active);
 			jsonDataset.put("revoked", revoked);
-			jsonDataset.put("guid", GUIDs.createGUID(publicKeyString, salt));
+			jsonDataset.put("guid", GUID.createGUID(publicKeyString, salt));
 			jsonDataset.put("defaults", defaults);
 			jsonDataset.put("legacyIDs", legacyIDs);
 			jsonDataset.put("schemaVersion", 1);
