@@ -31,6 +31,9 @@ public class Dataset
 	protected int schemaVersion;
 	protected JSONArray legacyIDs;
 	
+	private Dataset()
+	{}
+	
 	// TODO finish deserialize functionality
 	public static Dataset createFromJSONObject(JSONObject json)
 	{
@@ -47,6 +50,17 @@ public class Dataset
 		dataset.setTimeout(json.getString("timeout"));
 		dataset.setDefaults(json.getJSONObject("defaults"));
 		dataset.setLegacyIDs(json.getJSONArray("legacyIDs"));
+		
+		try
+		{
+			dataset.validateSchema();
+			dataset.checkIntegrity();
+		}
+		catch (DatasetIntegrityException e)
+		{
+			// TODO handle errors like this
+			return null;
+		}
 		
 		return dataset;
 	}
@@ -205,6 +219,20 @@ public class Dataset
 		return true;
 	}
 	
+	public boolean checkIntegrity() throws DatasetIntegrityException
+	{
+		if(false)
+			throw new DatasetIntegrityException("illegal parameter value...");
+		return true;
+	}
+	
+	/**
+	 * @deprecated
+	 * @param json
+	 * @return
+	 * @throws DatasetIntegrityException
+	 */
+	@Deprecated
 	public static boolean checkDatasetValidity(JSONObject json) throws DatasetIntegrityException
 	{
 		if(!json.has("guid"))

@@ -109,7 +109,7 @@ public class DatasetTool
 				
 				if(!inOverwriteDataset.equals("n") && !inOverwriteDataset.equals("y"))
 				{
-				    System.out.print("illegal parameter!\n");
+					System.out.print("illegal parameter!\n");
 				}
 				else if(inOverwriteDataset.equals("n"))
 				{
@@ -117,20 +117,20 @@ public class DatasetTool
 				}
 				else
 				{
-				    System.out.print("creating new dataset ...\n");
+					System.out.print("creating new dataset ...\n");
 				
-				JSONObject json = createNewDataset();
-				
-				dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
-				privateKey = json.getString("privateKey");
-				
-				verifyDataset();
-				
-				System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
-				
-				        printDataset();
-				    }
+					JSONObject json = createNewDataset();
+					
+					dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
+					privateKey = json.getString("privateKey");
+					
+					verifyDataset();
+					
+					System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
+					
+					printDataset();
 				}
+			}
 				
 				else if(command.equals("edit") || command.equals("e"))
 				{
