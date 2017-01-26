@@ -201,6 +201,7 @@ public class Dataset
 	
 	public boolean validateSchema() throws DatasetIntegrityException
 	{
+		
 		try (InputStream inputStream = getClass().getResourceAsStream("schema.json"))
 		{
 				JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
