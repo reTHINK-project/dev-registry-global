@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 import eu.rethink.globalregistry.model.Dataset;
 import eu.rethink.globalregistry.model.DatasetIntegrityException;
-import eu.rethink.globalregistry.model.GUIDs;
+import eu.rethink.globalregistry.model.GUID;
 import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.XSDDateTime;
 
@@ -109,7 +109,7 @@ public class DatasetTool
 				
 				if(!inOverwriteDataset.equals("n") && !inOverwriteDataset.equals("y"))
 				{
-				    System.out.print("illegal parameter!\n");
+					System.out.print("illegal parameter!\n");
 				}
 				else if(inOverwriteDataset.equals("n"))
 				{
@@ -117,20 +117,20 @@ public class DatasetTool
 				}
 				else
 				{
-				    System.out.print("creating new dataset ...\n");
+					System.out.print("creating new dataset ...\n");
 				
-				JSONObject json = createNewDataset();
-				
-				dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
-				privateKey = json.getString("privateKey");
-				
-				verifyDataset();
-				
-				System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
-				
-				        printDataset();
-				    }
+					JSONObject json = createNewDataset();
+					
+					dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
+					privateKey = json.getString("privateKey");
+					
+					verifyDataset();
+					
+					System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
+					
+					printDataset();
 				}
+			}
 				
 				else if(command.equals("edit") || command.equals("e"))
 				{
@@ -730,7 +730,7 @@ public class DatasetTool
 				// TODO implement format check
 				
 				userIDs.put(new JSONObject().put("uID", inUID).put("domain", inDomain));
-				
+
 				System.out.print("add another UserID? (y|n) [n]: \n");
 				inAddUserID = in.nextLine();
 			}
@@ -820,7 +820,7 @@ public class DatasetTool
 			jsonDataset.put("publicKey", publicKeyString);
 			jsonDataset.put("active", active);
 			jsonDataset.put("revoked", revoked);
-			jsonDataset.put("guid", GUIDs.createGUID(publicKeyString, salt));
+			jsonDataset.put("guid", GUID.createGUID(publicKeyString, salt));
 			jsonDataset.put("defaults", defaults);
 			jsonDataset.put("legacyIDs", legacyIDs);
 			jsonDataset.put("schemaVersion", 1);
@@ -846,10 +846,11 @@ public class DatasetTool
 	private static void verifyDataset()
 	{
 		System.out.print("verifying values of dataset ... ");
-		
+
+
 		try
 		{
-			Dataset.checkDatasetValidity(dataset.exportJSONObject());
+			dataset.validateSchema();
 			System.out.print("ok!\n");
 		}
 		catch (DatasetIntegrityException e)
@@ -857,6 +858,7 @@ public class DatasetTool
 			System.out.print("invalid!\n");
 			e.printStackTrace();
 		}
+
 	}
 	
 	private static void printDataset()

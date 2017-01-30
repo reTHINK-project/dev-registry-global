@@ -6,6 +6,11 @@ default branch is now `master` again!
 
 ## Changelog
 
+### 0.3.1
+
+- updated dependencies
+- dataset check via json schema
+
 ### 0.3.0
 
 - migrated to SpringBoot framework v1.4.3
@@ -87,7 +92,7 @@ Gets the dataset (a signed JWT) for the given GUID
 
 ### PUT /guid/{guid}
 
-Writes (creates and updates) a dataset (a signed JWT) for the given GUID. PLEASE NOTE THAT THE BODY OF THE HTTP REQUEST IS THE JWT IN PLAIN TEXT, NOT AS ANAMED PARAMETER!
+Writes (creates and updates) a dataset (a signed JWT) for the given GUID. PLEASE NOTE THAT THE BODY OF THE HTTP REQUEST IS THE JWT IN PLAIN TEXT, NOT AS A NAMED PARAMETER!
 
 #### Example: 
 
@@ -262,10 +267,10 @@ then start the container via
 
 Configuration of the GReg has changed starting with version 0.3.0. No config file is required, but the following parameters can be passed at startup:
 
--p --port_rest (default "5002")
--n --network_interface (default "eth0")
--n --connect_node (default "130.149.22.133")
--l --log_path (default "logs")
+- -p --port_rest (default "5002")
+- -n --network_interface (default "eth0")
+- -n --connect_node (default "130.149.22.133")
+- -l --log_path (default "logs")
 
 If the parameters are not passed at startup, the instance runs on the default values.
 
