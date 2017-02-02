@@ -22,7 +22,7 @@ import eu.rethink.globalregistry.dht.DHTManager;
 import eu.rethink.globalregistry.dht.GUIDNotFoundException;
 import eu.rethink.globalregistry.model.Dataset;
 import eu.rethink.globalregistry.model.DatasetIntegrityException;
-import eu.rethink.globalregistry.model.GUIDs;
+import eu.rethink.globalregistry.model.GUID;
 import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.IntegrityException;
 

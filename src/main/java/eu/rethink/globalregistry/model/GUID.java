@@ -11,9 +11,13 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by Half-Blood on 1/4/2017.
+ * Manages GUID creation and verification
+ * 
+ * @date 18.01.2017
+ * @version 1
+ * @author Sebastian Göndör
  */
-public class GUIDs {
+public class GUID {
     private static int ITERATIONS = 10000;
     private static String HASH_ALGORITHM = "HmacSHA256";
 

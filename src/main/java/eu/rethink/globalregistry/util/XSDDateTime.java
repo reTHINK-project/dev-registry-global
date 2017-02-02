@@ -6,6 +6,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -29,5 +30,21 @@ public class XSDDateTime {
         String timezone = tzFormatter.format(date);
 
         return formatter.format(date) + timezone.substring(0, 3) + ":" + timezone.substring(3);
+    }
+
+    public static boolean validateXSDDateTime(String value)  {
+        Date date = null;
+        try{
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            date = formatter.parse(value);
+            DateFormat tzFormatter = new SimpleDateFormat("Z");
+            String timezone = tzFormatter.format(date);
+            if (!value.equals(formatter.format(date) + timezone.substring(0, 3) + ":" + timezone.substring(3))) {
+                date = null;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date != null;
     }
 }

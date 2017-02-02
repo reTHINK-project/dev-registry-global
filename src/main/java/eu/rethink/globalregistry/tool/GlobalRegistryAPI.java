@@ -1,4 +1,4 @@
-package eu.rethink.globalregistry.test;
+package eu.rethink.globalregistry.tool;
 
 import org.json.JSONObject;
 
