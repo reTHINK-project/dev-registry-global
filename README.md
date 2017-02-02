@@ -1,15 +1,14 @@
 # dev-registry-global
 Global Registry
 
-!!! WARNING !!!
-default branch is now `master` again!
-
 ## Changelog
 
 ### 0.3.1
 
 - updated dependencies
 - dataset check via json schema
+- thourough dataset format checks
+- support for multiple dataset versions
 
 ### 0.3.0
 
