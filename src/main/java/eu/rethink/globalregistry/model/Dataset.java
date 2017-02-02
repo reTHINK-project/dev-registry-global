@@ -2,6 +2,7 @@ package eu.rethink.globalregistry.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -9,6 +10,7 @@ import java.util.regex.Pattern;
 
 import eu.rethink.globalregistry.util.XSDDateTime;
 import io.jsonwebtoken.impl.Base64UrlCodec;
+
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONTokener;
@@ -337,8 +339,6 @@ public class Dataset
 		// TODO: userIDs are now objects. Rewrite check
 		if(!json.has("userIDs"))
 			throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");
-
-
 		if(!json.has("lastUpdate"))
 			throw new DatasetIntegrityException("mandatory parameter 'lastUpdate' missing");
 		if(!json.has("timeout"))
@@ -351,7 +351,6 @@ public class Dataset
 			throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
 		if(!json.has("defaults"))
 			throw new DatasetIntegrityException("mandatory parameter 'defaults' missing");
-		//optional
 		if(!json.getJSONObject("defaults").has("voice"))
 			throw new DatasetIntegrityException("mandatory parameter 'defaults : voice' missing");
 		if(!json.getJSONObject("defaults").has("chat"))
