@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * Main class for GlobalRegistry daemon
  * 
- * @date 16.01.2017
+ * @date 02.02.2017
  * @version 1
  * @author Sebastian Göndör, Parth Singh
  */
@@ -50,7 +50,7 @@ public class RestService
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> index() throws URISyntaxException
 	{
-		LOGGER.error("Incomin request: GET /");
+		LOGGER.error("Incoming request: GET /");
 		List<PeerAddress> AllNeighbors = DHTManager.getInstance().getAllNeighbors();
 		
 		JSONArray connectedNodes = new JSONArray();
@@ -557,7 +557,7 @@ public class RestService
 	@RequestMapping(value = "teapot", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> teapot() throws URISyntaxException
 	{
-		LOGGER.error("Incomin request: GET /teapot");
+		LOGGER.error("Incoming request: GET /teapot");
 		
 		JSONObject response = new JSONObject();
 		
