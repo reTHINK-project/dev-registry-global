@@ -74,14 +74,14 @@ public class Dataset
 			// TODO handle errors like this
 			return null;
 		}
-
+		
 		return dataset;
 	}
 	
 	public JSONObject exportJSONObject()
 	{
 		JSONObject json = new JSONObject();
-
+		
 		json.put("schemaVersion", this.schemaVersion);
 		json.put("salt", this.salt);
 		json.put("userIDs", this.userIDs);
@@ -218,7 +218,7 @@ public class Dataset
 		int version = this.schemaVersion;
 		switch (version) {
 			case 1:
-				try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("schema.json")) {
+				try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("schema_v1.json")) {
 					JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
 					Schema schema = SchemaLoader.load(rawSchema);
 					schema.validate(exportJSONObject());
@@ -229,7 +229,7 @@ public class Dataset
 				}
 				break;
 			case 2:
-				try (InputStream inputStream = getClass().getResourceAsStream("schema2.json")) {
+				try (InputStream inputStream = getClass().getResourceAsStream("schema_v2.json")) {
 					JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
 					Schema schema = SchemaLoader.load(rawSchema);
 					schema.validate(exportJSONObject());
@@ -244,52 +244,52 @@ public class Dataset
 		}
 		return true;
 	}
-
-    //checking integrity is for checking the value of each variable inside dataset, if its correct or not.
+	
+	//checking integrity is for checking the value of each variable inside dataset, if its correct or not.
 	public boolean checkIntegrity() throws DatasetIntegrityException
 	{
-
+		
 		if (getGUID().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'guid' missing");
 		if (!getGUID().equals(GUID.createGUID(this.getPublicKey(), this.getSalt())))
 			throw new DatasetIntegrityException("illegal parameter value...");
-
+		
 		if (getLastUpdate().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'lastUpdate' missing");
 		if (!XSDDateTime.validateXSDDateTime(getLastUpdate()))
 			throw new DatasetIntegrityException("invalid 'DateTime' format...");
-
+		
 		if(getTimeout().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'timeout' missing");
 		if (!XSDDateTime.validateXSDDateTime(getTimeout()))
 			throw new DatasetIntegrityException("invalid 'DateTime' format...");
-
+		
 		if (getPublicKey().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'publicKey' missing");
 		String stringtobechecked = getPublicKey().substring(26, getPublicKey().length()-24);
 		if (!Base64.isArrayByteBase64(stringtobechecked.getBytes()))
 			throw new DatasetIntegrityException("invalid 'PublicKey' character set...");
-
+		
 		if (getSalt().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'salt' missing");
 		if (!Base64.isArrayByteBase64(getSalt().getBytes()))
 			throw new DatasetIntegrityException("invalid 'Salt' character set...");
-
+		
 		String isactive = Integer.toString(getActive());
 		if(isactive.isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'Active' missing");
 		if(getActive() != 0 && getActive() != 1)
 			throw new DatasetIntegrityException("invalid 'Active' value...");
-
+		
 		String isrevoked = Integer.toString(getRevoked());
 		if(isrevoked.isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
 		if(getRevoked() != 0 && getRevoked() != 1)
 			throw new DatasetIntegrityException("invalid 'Revoked' value...");
-
+		
 		/*if(getUserIDs().length() == 0)
 			throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");*/
-
+		
 		String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 		Pattern pattern = Pattern.compile(regex);
 		for(int n = 0; n < getUserIDs().length(); n++)
@@ -318,7 +318,7 @@ public class Dataset
 					(!Base64.isArrayByteBase64(id.getBytes())))
 				throw new DatasetIntegrityException("invalid 'LegacyID' character set...");
 		}
-
+		
 		return true;
 	}
 	

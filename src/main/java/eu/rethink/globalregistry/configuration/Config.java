@@ -11,10 +11,10 @@ public class Config
 {
 	private static Config _singleton = null;
 
-	private static final String		versionName				= "0.3.0";
-	private static final int		versionNumber			= 1406;
+	private static final String		versionName				= "0.3.1";
+	private static final int		versionNumber			= 1501;
 	private static final String		versionCode				= "springified";
-	private static final String		versionDate				= "2017-01-17";
+	private static final String		versionDate				= "2017-02-02";
 	private static final String		productName				= "reTHINK Global Registry";
 	private static final String		productNameShort		= "gReg";
 
