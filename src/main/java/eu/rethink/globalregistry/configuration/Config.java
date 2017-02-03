@@ -12,14 +12,14 @@ public class Config
 	private static Config _singleton = null;
 
 	private static final String		versionName				= "0.3.1";
-	private static final int		versionNumber			= 1501;
+	private static final int		versionNumber			= 1502;
 	private static final String		versionCode				= "springified";
-	private static final String		versionDate				= "2017-02-02";
+	private static final String		versionDate				= "2017-02-03";
 	private static final String		productName				= "reTHINK Global Registry";
 	private static final String		productNameShort		= "gReg";
 
 	private static final int		portDHT					= 5001;
-	private static final int		versionDatasetSchema	= 1;
+	private static final int		versionDatasetSchema	= 2;
 	private static final int		versionRESTAPI			= 1;
 	private static final int		versionDHTAPI			= 1;
 
