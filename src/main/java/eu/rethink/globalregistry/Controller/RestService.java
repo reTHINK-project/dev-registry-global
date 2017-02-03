@@ -36,8 +36,8 @@ import java.util.List;
 /**
  * Main class for GlobalRegistry daemon
  * 
- * @date 02.02.2017
- * @version 1
+ * @date 03.02.2017
+ * @version 2
  * @author Sebastian Göndör, Parth Singh
  */
 @RestController
@@ -60,6 +60,7 @@ public class RestService
 		}
 		
 		JSONObject version = new JSONObject();
+		version.put("date", Config.getInstance().getVersionDate());
 		version.put("version", Config.getInstance().getVersionName());
 		version.put("build", Config.getInstance().getVersionNumber());
 		
