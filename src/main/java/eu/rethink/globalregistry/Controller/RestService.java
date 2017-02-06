@@ -1,5 +1,6 @@
 package eu.rethink.globalregistry.Controller;
 
+import eu.rethink.globalregistry.model.*;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -20,9 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import eu.rethink.globalregistry.configuration.Config;
 import eu.rethink.globalregistry.dht.DHTManager;
 import eu.rethink.globalregistry.dht.GUIDNotFoundException;
-import eu.rethink.globalregistry.model.Dataset;
-import eu.rethink.globalregistry.model.DatasetIntegrityException;
-import eu.rethink.globalregistry.model.GUID;
 import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.IntegrityException;
 
@@ -141,6 +139,18 @@ public class RestService
 					// verify dataset integrity
 					try
 					{
+						/*
+						OldDataset oldDataset = new OldDataset();
+						if(data.getInt("schemaVersion") == 1){
+							oldDataset.validateSchema(data);
+							oldDataset.checkIntegrity(data);
+						}
+						NewDataset newDataset = new NewDataset();
+						if(data.getInt("schemaVersion") == 2){
+							newDataset.validateSchema(data);
+							newDataset.checkIntegrity(data);
+						}
+						*/
 						Dataset.checkDatasetValidity(data);
 					}
 					catch (DatasetIntegrityException e)
@@ -277,6 +287,18 @@ public class RestService
 			// verify dataset integrity
 			try
 			{
+				/*
+				OldDataset oldDataset = new OldDataset();
+				if(newData.getInt("schemaVersion") == 1){
+					oldDataset.validateSchema(newData);
+					oldDataset.checkIntegrity(newData);
+				}
+				NewDataset newDataset = new NewDataset();
+				if(newData.getInt("schemaVersion") == 2){
+					newDataset.validateSchema(newData);
+					newDataset.checkIntegrity(newData);
+				}
+				*/
 				Dataset.checkDatasetValidity(newData);
 			}
 			catch (DatasetIntegrityException e)
@@ -362,6 +384,18 @@ public class RestService
 				// verify the existing dataset's integrity
 				try
 				{
+					/*
+					OldDataset oldDataset = new OldDataset();
+					if(existingData.getInt("schemaVersion") == 1){
+						oldDataset.validateSchema(existingData);
+						oldDataset.checkIntegrity(existingData);
+					}
+					NewDataset newDataset = new NewDataset();
+					if(existingData.getInt("schemaVersion") == 2){
+						newDataset.validateSchema(existingData);
+						newDataset.checkIntegrity(existingData);
+					}
+					*/
 					Dataset.checkDatasetValidity(existingData);
 				}
 				catch (DatasetIntegrityException e)

@@ -55,27 +55,6 @@
 				}
 			},
 			"required": ["voice", "chat", "video"]
-		},
-		"legacyIDs": {
-		"type": "array",
-		"items": {
-		"type": "object",
-		"properties": {
-		"type": {
-			"type": "string"
-		},
-		"category": {
-			"type": "string"
-		},
-					"description": {
-						"type": "string"
-					},
-					"id": {
-						"type": "string"
-					}
-				},
-				"required": ["type", "category", "id"]
-			}
 		}
 	},
 	"required": ["guid", "userIDs", "lastUpdate", "timeout", "publicKey", "salt", "active", "revoked", "defaults"]
