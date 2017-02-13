@@ -552,6 +552,42 @@ public class RestService
 	}
 	
 	/**
+	 * DELETE
+	 * 
+	 */
+	@RequestMapping(value = "guid/{GUID}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> deletedata(@PathVariable("GUID") String GUID) throws URISyntaxException
+	{
+		LOGGER.error("Incoming request: DELETE /guid/" + GUID);
+		
+		try
+		{
+			DHTManager.getInstance().delete(GUID);
+		}
+		catch(IOException e)
+		{
+			JSONObject response = new JSONObject();
+			
+			response.put("Code", 500);
+			response.put("Description", "Internal server error");
+			response.put("Explanation", "Internal Server Error: " + GUID + " e: " + e.getMessage());
+			response.put("Value", "");
+			
+			return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		JSONObject response = new JSONObject();
+		
+		response.put("Code", 200);
+		response.put("Description", "OK");
+		response.put("Explanation", "deleted GUID " + GUID);
+		response.put("Value", "");
+		
+		return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
+		
+	}
+	
+	/**
 	 * Easteregg. Just returning "I'm a teapot" as of RFC #2324
 	 * 
 	 */
