@@ -3,6 +3,13 @@ Global Registry
 
 ## Changelog
 
+### 0.3.2
+
+- updated SpringBoot framework to v1.5.1
+- updated dependencies
+- added DELETE API for testing purposes
+- fixed and extended support for multiple dataset versions (version supported: 1,2)
+
 ### 0.3.1
 
 - updated dependencies
