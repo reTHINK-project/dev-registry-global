@@ -1,20 +1,23 @@
 package eu.rethink.globalregistry.configuration;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * Configuration class of the GlobalRegistry. Using singleton pattern.
  * 
  * @author Sebastian Göndör
- * @version 2
- * @date 17.01.2017
+ * @version 3
+ * @date 13.02.2017
  */
 public class Config
 {
 	private static Config _singleton = null;
 
-	private static final String		versionName				= "0.3.1";
-	private static final int		versionNumber			= 1502;
+	private static final String		versionName				= "0.3.2";
+	private static final int		versionNumber			= 1553;
 	private static final String		versionCode				= "springified";
-	private static final String		versionDate				= "2017-02-03";
+	private static final String		versionDate				= "2017-02-13";
 	private static final String		productName				= "reTHINK Global Registry";
 	private static final String		productNameShort		= "gReg";
 
@@ -77,6 +80,28 @@ public class Config
 
 	public void setConnectNode(String connectNode) {
 		this.connectNode = connectNode;
+	}
+	
+	/**
+	 * Set the connectNode via a URL, e.g., www.example.com/node
+	 * 
+	 * @param connectNodeURL
+	 */
+	public void setConnectNodeViaURL(String connectNodeURL)
+	{
+		InetAddress address;
+		
+		try
+		{
+			address = InetAddress.getByName(connectNodeURL);
+		}
+		catch (UnknownHostException e)
+		{
+			this.connectNode = connectNodeDefault;
+			return;
+		}
+		
+		this.connectNode = address.getHostAddress(); 
 	}
 
 	public int getPortREST() {
