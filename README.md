@@ -5,6 +5,7 @@ Global Registry
 
 ### 0.3.2
 
+- default node changed to 130.149.22.220 (new testbed seeding server)
 - updated SpringBoot framework to v1.5.1
 - updated dependencies
 - added DELETE API for testing purposes
