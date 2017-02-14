@@ -20,6 +20,7 @@ cd /var
 sudo mkdir greg
 cd greg
 sudo git clone https://github.com/reTHINK-project/dev-registry-global.git
+sudo git checkout tags/0.3.2
 sudo mvn clean
 sudo mvn install
 docker build -t rethink/greg:0.3.2 .
