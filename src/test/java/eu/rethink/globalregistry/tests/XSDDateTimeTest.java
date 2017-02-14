@@ -25,9 +25,9 @@ public class XSDDateTimeTest
 		assertTrue(XSDDateTime.validateXSDDateTime(validXSD1));
 		assertTrue(XSDDateTime.validateXSDDateTime(validXSD2));
 		
-		//assertFalse(XSDDateTime.validateXSDDateTime(invalidXSD1));
+		assertFalse(XSDDateTime.validateXSDDateTime(invalidXSD1));
 		assertFalse(XSDDateTime.validateXSDDateTime(invalidXSD2));
-		//assertFalse(XSDDateTime.validateXSDDateTime(invalidXSD3));
+		assertFalse(XSDDateTime.validateXSDDateTime(invalidXSD3));
 		assertFalse(XSDDateTime.validateXSDDateTime(invalidXSD4));
 		assertFalse(XSDDateTime.validateXSDDateTime(invalidXSD5));
 	}
