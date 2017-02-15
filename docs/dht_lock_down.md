@@ -5,10 +5,10 @@ Global Registry Security Considerations
 
 This proposal presents some modifications to the Global Registry/TomP2P, to improve the DHT security.
 
-Right now is possible to any node to enter the DHT, and therefore a malicious node can modify the data stored freely. 
-**Is necessary to provide DHT access only to trusted nodes**.
+Right now, it is possible for any node to enter the DHT, and therefore a malicious node can modify the data stored freely. 
+**It is necessary to restrict DHT access only to trusted nodes**.
 
-Since it was not possible to implement the previous security extensions at a *Communication* level (since is not possible to intercept every TomP2P messages), this proposal will focus on a security extension at *Storage/Data* level.
+Since it was not possible to implement the previous security extensions at a *Communication* level (as it is not possible to intercept every TomP2P messages), this proposal will focus on a security extension at the *Storage/Data* level.
 
 ### Proposed Solution
 
@@ -22,7 +22,7 @@ The following fields should be added to the message:
 
  - `nodeCertificate` - the node certificate (PEM encoded);
  - `nodeSignature` - the node digital signature of the dataset;
- - `timestamp`- the message timestamp
+ - `timestamp`- the data timestamp (it might be necessary to keep this in the datastore if no equivalent exists). 
  
 ### Implementation
 
@@ -30,8 +30,10 @@ In order, to validate the dataset the following verifications should be done:
 
  - the node certificate sent in the message is valid, i.e is signed by a trusted Certificate Authority (CA);
  - the signature added by the node is valid.
+ - the timestamp is greater than the current data timestamp
+ - the timestamp is fresh (less than 60s?)
 
-This verification should be done when reading or writing from/in the DHT.
+This verification must be done when writting to the DHT. The first two validations should be performed when reading from the DHT.
 
 ### Attack Mitigation
 
