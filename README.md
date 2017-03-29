@@ -264,7 +264,7 @@ GUIDs can be created with the following algorithm:
 
 Create the Docker image by running
 
-```docker build .```
+```docker build -t rethink/greg:0.3.3 .```
 
 then start the container via
 
