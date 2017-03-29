@@ -5,7 +5,7 @@ On a Debian-based system, execute the following commands to build GReg
 - Install maven and git:
 ```
 sudo apt-get update && sudo apt-get dist-upgrade
-sudo apt-get install –y maven git
+sudo apt-get -y install maven git
 ```
 - Install Docker (https://docs.docker.com/engine/installation/linux/debian/):
 ```
@@ -27,5 +27,5 @@ docker build -t rethink/greg:0.3.2 .
 ```
 - Run GReg:
 ```
-docker run –p 5001:5001 –p 5002:5002 rethink/greg:0.3.2
+docker run -d –p 5001:5001/tcp -p 5001:5001/udp –p 5002:5002/tcp rethink/greg:0.3.2
 ```
