@@ -43,8 +43,6 @@ public class DatasetTest
 	@Test
 	public void createDatasetFromJSON()
 	{
-		data = new JSONObject();
-		
 		// TODO create dataset from JSON
 		if(data.getInt("schemaVersion") == 1)
 		{
