@@ -5,7 +5,7 @@ Global Registry
 
 ### 0.3.3
 
-- updated SprintBoot framework to v1.5.2
+- updated SpringBoot framework to v1.5.2
 - fixed some small bugs
 - fixed connectivity bug
 
