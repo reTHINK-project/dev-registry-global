@@ -20,7 +20,10 @@
 						"type": "string"
 					}
 				},
-				"required": ["uid", "domain"]
+				"required": [
+					"uid",
+					"domain"
+				]
 			}
 		},
 		"lastUpdate": {
@@ -45,7 +48,7 @@
 			"type": "object",
 			"properties": {
 				"voice": {
-				"type": "string"
+					"type": "string"
 				},
 				"chat": {
 					"type": "string"
@@ -54,7 +57,11 @@
 					"type": "string"
 				}
 			},
-			"required": ["voice", "chat", "video"]
+			"required": [
+				"voice",
+				"chat",
+				"video"
+			]
 		},
 		"legacyIDs": {
 			"type": "array",
@@ -74,9 +81,23 @@
 						"type": "string"
 					}
 				},
-			"required": ["type", "category", "id"]
+				"required": [
+					"type",
+					"category",
+					"id"
+				]
 			}
 		}
 	},
-	"required": ["guid", "userIDs", "lastUpdate", "timeout", "publicKey", "salt", "active", "revoked", "defaults"]
+	"required": [
+		"guid",
+		"userIDs",
+		"lastUpdate",
+		"timeout",
+		"publicKey",
+		"salt",
+		"active",
+		"revoked",
+		"defaults"
+	]
 }

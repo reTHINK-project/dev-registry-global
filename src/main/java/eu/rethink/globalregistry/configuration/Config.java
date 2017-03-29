@@ -7,17 +7,17 @@ import java.net.UnknownHostException;
  * Configuration class of the GlobalRegistry. Using singleton pattern.
  * 
  * @author Sebastian Göndör
- * @version 3
- * @date 13.02.2017
+ * @version 4
+ * @date 29.03.2017
  */
 public class Config
 {
 	private static Config _singleton = null;
 
-	private static final String		versionName				= "0.3.2";
-	private static final int		versionNumber			= 1569;
+	private static final String		versionName				= "0.3.3";
+	private static final int		versionNumber			= 1578;
 	private static final String		versionCode				= "springified";
-	private static final String		versionDate				= "2017-02-14";
+	private static final String		versionDate				= "2017-03-29";
 	private static final String		productName				= "reTHINK Global Registry";
 	private static final String		productNameShort		= "gReg";
 

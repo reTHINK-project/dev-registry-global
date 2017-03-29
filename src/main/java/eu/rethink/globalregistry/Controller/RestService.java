@@ -72,7 +72,6 @@ public class RestService
 		response.put("connectedNodes", connectedNodes);
 		
 		return new ResponseEntity<String>(response.toString(), HttpStatus.OK);
-		
 	}
 	
 	//STATUS: Index Function is working absolutely fine.
@@ -553,10 +552,11 @@ public class RestService
 	
 	/**
 	 * DELETE
+	 * @throws JSONException 
 	 * 
 	 */
 	@RequestMapping(value = "guid/{GUID}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> deletedata(@PathVariable("GUID") String GUID) throws URISyntaxException
+	public ResponseEntity<String> deleteData(@PathVariable("GUID") String GUID) throws URISyntaxException
 	{
 		LOGGER.error("Incoming request: DELETE /guid/" + GUID);
 		
@@ -589,6 +589,7 @@ public class RestService
 	
 	/**
 	 * Easteregg. Just returning "I'm a teapot" as of RFC #2324
+	 * @throws JSONException 
 	 * 
 	 */
 	@RequestMapping(value = "teapot", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
