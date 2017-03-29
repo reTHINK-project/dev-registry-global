@@ -20,12 +20,12 @@ cd /var
 sudo mkdir greg
 cd greg
 sudo git clone https://github.com/reTHINK-project/dev-registry-global.git
-sudo git checkout tags/0.3.2
+sudo git checkout tags/0.3.3
 sudo mvn clean
 sudo mvn install
-docker build -t rethink/greg:0.3.2 .
+docker build -t rethink/greg:0.3.3 .
 ```
 - Run GReg:
 ```
-docker run -d –p 5001:5001/tcp -p 5001:5001/udp –p 5002:5002/tcp rethink/greg:0.3.2
+docker run -d -p 5001:5001/tcp -p 5001:5001/udp -p 5002:5002/tcp rethink/greg:0.3.3
 ```
