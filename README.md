@@ -78,7 +78,7 @@ Global Registry
 
 - 130.149.22.220:5002 (TUB)
 - 130.149.22.227:5002 (TUB)
-- x.x.x.x:5002 (orange)
+- 161.106.2.20:5002 (orange)
 
 ## Interfaces
 
