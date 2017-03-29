@@ -211,8 +211,7 @@ public class Dataset
 	{
 		this.legacyIDs = legacyIDs;
 	}
-
-
+	
 	//validate schema is for checking the given datset against its schema format and structure.
 	public boolean validateSchema() throws DatasetIntegrityException {
 		int version = this.schemaVersion;

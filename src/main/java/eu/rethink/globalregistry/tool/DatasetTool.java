@@ -39,15 +39,15 @@ public class DatasetTool
 	public static int GREG_PORT = 5002;
 	
 	protected static JSONArray nodes = new JSONArray();
-	protected static final String defaultNode = "130.149.22.133";
-	protected static String activeNode = "130.149.22.133";
+	protected static final String defaultNode = "130.149.22.220";
+	protected static String activeNode = "130.149.22.220";
 	
 	protected static Dataset dataset;
 	protected static String privateKey;
 	
 	private static void printHelp()
 	{
-		System.out.print("------------------------------\nv 0.0.8\n------------------------------\n");
+		System.out.print("------------------------------\nv 0.1.0\n------------------------------\n");
 		System.out.print("create, c:      create new dataset\n");
 		System.out.print("edit, e:        edit dataset\n");
 		System.out.print("exit, x:        exit\n");

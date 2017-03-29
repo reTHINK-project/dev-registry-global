@@ -57,7 +57,7 @@ public class DHTManager
 		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Config.getInstance().getPortDHT()).start()).start();
 		
 		new IndirectReplication(peer).start();
-
+		
 		InetAddress address = Inet4Address.getByName(Config.getInstance().getConnectNode());
 		FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Config.getInstance().getPortDHT()).start();
 		futureDiscover.awaitUninterruptibly();
