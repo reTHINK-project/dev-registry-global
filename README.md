@@ -3,6 +3,12 @@ Global Registry
 
 ## Changelog
 
+### 0.3.3
+
+- updated SprintBoot framework to v1.5.2
+- fixed some small bugs
+- fixed connectivity bug
+
 ### 0.3.2
 
 - default node changed to 130.149.22.220 (new testbed seeding server)
@@ -70,9 +76,9 @@ Global Registry
 
 ## Testbed
 
-- 130.149.22.133:5002
-- 130.149.22.134:5002
-- 130.149.22.135:5002
+- 130.149.22.220:5002 (TUB)
+- 130.149.22.227:5002 (TUB)
+- x.x.x.x:5002 (orange)
 
 ## Interfaces
 
@@ -84,7 +90,7 @@ Will display version and info about the daemon
     GET / HTTP/1.1
     
     Response:
-    {"Value":"gReg v0.1.1a 1235 (2016-01-20) [ 130.149.22.135 130.149.22.134 ]","Code":200,"Message":"OK"}
+    {"Value":"gReg v0.1.1a 1235 (2016-01-20) [ 130.149.22.220 130.149.22.227 ]","Code":200,"Message":"OK"}
 
 ### GET /guid/{guid}
 
@@ -268,7 +274,7 @@ Create the Docker image by running
 
 then start the container via
 
-```docker run -p 5001:5001 -p 5002:5002 CONTAINERNAME```
+```docker run -d -p 5001:5001/tcp -p 5001:5001/udp -p 5002:5002/tcp rethink/greg:0.3.3```
 
 ## config
 
@@ -276,7 +282,7 @@ Configuration of the GReg has changed starting with version 0.3.0. No config fil
 
 - -p --port_rest (default "5002")
 - -n --network_interface (default "eth0")
-- -n --connect_node (default "130.149.22.133")
+- -n --connect_node (default "130.149.22.220")
 - -l --log_path (default "logs")
 
 If the parameters are not passed at startup, the instance runs on the default values.
