@@ -1,6 +1,8 @@
 package eu.rethink.globalregistry;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import eu.rethink.globalregistry.configuration.Config;
 import eu.rethink.globalregistry.dht.DHTManager;
@@ -22,11 +24,12 @@ import org.springframework.boot.SpringApplication;
 /**
  * Main class for GlobalRegistry daemon
  * 
- * @date 03.02.2017
- * @version 2
+ * @date 03.04.2017
+ * @version 3
  * @author Sebastian Göndör, Parth Singh
  */
 @SpringBootApplication
+@EnableScheduling
 public class GlobalRegistryServer implements Daemon
 {
 	private static Logger LOGGER;
@@ -43,6 +46,12 @@ public class GlobalRegistryServer implements Daemon
 				.longOpt("help")
 				.desc("displays help on cli parameters")
 				.build();
+		
+		//Option reconnectIntervalOption = Option.builder("r")
+		//		.longOpt("reconnect_interval")
+		//		.desc("sets the reconnect interval in hours. 0 disables reconnect [" + config.getReconnectInterval() + "]")
+		//		.hasArg()
+		//		.build();
 		
 		Option portRESTOption = Option.builder("p")
 				.longOpt("port_rest")
@@ -68,6 +77,7 @@ public class GlobalRegistryServer implements Daemon
 				.hasArg()
 				.build();
 		
+		//options.addOption(reconnectIntervalOption);
 		options.addOption(helpOption);
 		options.addOption(portRESTOption);
 		options.addOption(networkInterfaceOption);
@@ -87,6 +97,10 @@ public class GlobalRegistryServer implements Daemon
 				System.exit(0);
 			}
 			
+			//if(cmd.hasOption("r"))
+			//{
+			//	config.setReconnectInterval(Integer.parseInt(cmd.getOptionValue("r"))); // TODO check for valid values
+			//}
 			if(cmd.hasOption("p"))
 			{
 				config.setPortREST(Integer.parseInt(cmd.getOptionValue("p"))); // TODO check for valid values
@@ -105,6 +119,7 @@ public class GlobalRegistryServer implements Daemon
 			}
 			
 			System.out.println("-----Configuration: ");
+			//System.out.println("reconnectInterval: " + config.getReconnectInterval());
 			System.out.println("connectNode: " + config.getConnectNode());
 			System.out.println("portREST: " + config.getPortREST());
 			System.out.println("networkInterface: " + config.getNetworkInterface());
@@ -142,6 +157,23 @@ public class GlobalRegistryServer implements Daemon
 		catch (Exception e)
 		{
 			LOGGER.info("failed!");
+			e.printStackTrace();
+		}
+	}
+	
+	// 5 minute delay, then every 12 hours
+	//@Scheduled(initialDelay=5 * 1000, fixedRate=30 * 1000)
+	@Scheduled(initialDelay=5 * 60 * 1000, fixedRate=12 * 60 * 60 * 1000)
+	protected void reconnect()
+	{
+		try
+		{
+			LOGGER.info("running reconnect functionality...");
+			DHTManager.getInstance().connectToConnectNode();
+		}
+		catch (Exception e)
+		{
+			LOGGER.info("reconnect functionality failed!");
 			e.printStackTrace();
 		}
 	}
