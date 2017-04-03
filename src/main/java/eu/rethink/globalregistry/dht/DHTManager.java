@@ -12,9 +12,13 @@ import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.replication.IndirectReplication;
 import net.tomp2p.storage.Data;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import eu.rethink.globalregistry.Controller.RestService;
 import eu.rethink.globalregistry.configuration.Config;
 
 import java.io.IOException;
@@ -26,8 +30,8 @@ import java.util.Random;
 /**
  * DHT Manager class for accessing the DHT
  * 
- * @date 10.01.2017
- * @version 1
+ * @date 03.04.2017
+ * @version 2
  * @author Sebastian Göndör, Parth Singh
  */
 @Repository
@@ -35,6 +39,7 @@ public class DHTManager
 {
 	@Autowired
 	private static DHTManager	instance	= null;
+	
 	private PeerDHT peer;
 	
 	private DHTManager()
@@ -56,6 +61,20 @@ public class DHTManager
 		bind.addInterface(Config.getInstance().getNetworkInterface());
 		peer = new PeerBuilderDHT(new PeerBuilder(new Number160(rand)).ports(Config.getInstance().getPortDHT()).start()).start();
 		
+		this.connectToConnectNode();
+		/*new IndirectReplication(peer).start();
+		
+		InetAddress address = Inet4Address.getByName(Config.getInstance().getConnectNode());
+		FutureDiscover futureDiscover = peer.peer().discover().inetAddress(address).ports(Config.getInstance().getPortDHT()).start();
+		futureDiscover.awaitUninterruptibly();
+		FutureBootstrap futureBootstrap = peer.peer().bootstrap().inetAddress(address).ports(Config.getInstance().getPortDHT()).start();
+		futureBootstrap.awaitUninterruptibly();*/
+		
+		return this;
+	}
+	
+	public DHTManager connectToConnectNode() throws IOException
+	{
 		new IndirectReplication(peer).start();
 		
 		InetAddress address = Inet4Address.getByName(Config.getInstance().getConnectNode());
