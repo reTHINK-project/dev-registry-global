@@ -276,11 +276,11 @@ GUIDs can be created with the following algorithm:
 
 Create the Docker image by running
 
-```docker build -t rethink/greg:0.3.3 .```
+```docker build -t rethink/greg:0.3.4 .```
 
 then start the container via
 
-```docker run -d -p 5001:5001/tcp -p 5001:5001/udp -p 5002:5002/tcp rethink/greg:0.3.3```
+```docker run -d -p 5001:5001/tcp -p 5001:5001/udp -p 5002:5002/tcp rethink/greg:0.3.4```
 
 ## config
 
