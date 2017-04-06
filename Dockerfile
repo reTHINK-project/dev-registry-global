@@ -13,7 +13,7 @@ WORKDIR /build
 #ADD *.private.der /build/
 #ADD rethink-ca /build/rethink-ca
 #ADD docker-entrypoint.sh /
-ADD target/ReThinkGlobalRegistry-0.3.3.jar app.jar
+ADD target/ReThinkGlobalRegistry-0.3.4.jar app.jar
 #RUN ["mvn", "dependency:resolve"]
 #RUN ["mvn", "verify"]
 

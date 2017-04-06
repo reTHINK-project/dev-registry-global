@@ -15,9 +15,9 @@ public class Config
 	private static Config		_singleton					= null;
 	
 	private static final String	versionName					= "0.3.4";
-	private static final int	versionNumber				= 1593;
+	private static final int	versionNumber				= 1597;
 	private static final String	versionCode					= "springified";
-	private static final String	versionDate					= "2017-04-03";
+	private static final String	versionDate					= "2017-04-06";
 	private static final String	productName					= "reTHINK Global Registry";
 	private static final String	productNameShort			= "gReg";
 	
