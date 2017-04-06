@@ -11,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import eu.rethink.globalregistry.dht.DHTManager;
 import eu.rethink.globalregistry.dht.GUIDNotFoundException;
 import eu.rethink.globalregistry.model.Dataset;
 import eu.rethink.globalregistry.model.DatasetIntegrityException;
-import eu.rethink.globalregistry.model.GUID;
 import eu.rethink.globalregistry.util.ECDSAKeyPairManager;
 import eu.rethink.globalregistry.util.IntegrityException;
 
@@ -44,13 +42,12 @@ import java.util.List;
 @RequestMapping("/")
 public class RestService
 {
-	@Autowired
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestService.class);
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> index() throws URISyntaxException
 	{
-		LOGGER.error("Incoming request: GET /");
+		LOGGER.info("Incoming request: GET /");
 		List<PeerAddress> AllNeighbors = DHTManager.getInstance().getAllNeighbors();
 		
 		JSONArray connectedNodes = new JSONArray();
@@ -80,7 +77,7 @@ public class RestService
 	@ResponseBody
 	public ResponseEntity<String> getEntitybyGUID(@PathVariable("GUID") String GUID)
 	{
-		LOGGER.error("Incoming request: GET /guid/" + GUID);
+		LOGGER.info("Incoming request: GET /guid/" + GUID);
 		
 		if(GUID == null)
 		{
@@ -259,7 +256,7 @@ public class RestService
 	@RequestMapping(value = "guid/{GUID}", method = RequestMethod.PUT)
 	public ResponseEntity<String> putdata(@RequestBody String jwt, @PathVariable("GUID") String GUID)
 	{
-		LOGGER.error("Incoming request: PUT /guid/" + GUID + " - JWT: " + jwt);
+		LOGGER.info("Incoming request: PUT /guid/" + GUID + " - JWT: " + jwt);
 		
 		JSONObject newData; // the new version of the jwt
 		JSONObject existingData; // the already existing version (if there is any)
@@ -558,7 +555,7 @@ public class RestService
 	@RequestMapping(value = "guid/{GUID}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> deleteData(@PathVariable("GUID") String GUID) throws URISyntaxException
 	{
-		LOGGER.error("Incoming request: DELETE /guid/" + GUID);
+		LOGGER.info("Incoming request: DELETE /guid/" + GUID);
 		
 		try
 		{
@@ -595,7 +592,7 @@ public class RestService
 	@RequestMapping(value = "teapot", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> teapot() throws URISyntaxException
 	{
-		LOGGER.error("Incoming request: GET /teapot");
+		LOGGER.info("Incoming request: GET /teapot");
 		
 		JSONObject response = new JSONObject();
 		
