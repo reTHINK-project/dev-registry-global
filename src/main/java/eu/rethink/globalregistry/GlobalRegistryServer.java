@@ -24,7 +24,7 @@ import org.springframework.boot.SpringApplication;
 /**
  * Main class for GlobalRegistry daemon
  * 
- * @date 03.04.2017
+ * @date 06.04.2017
  * @version 3
  * @author Sebastian Göndör, Parth Singh
  */
@@ -163,12 +163,13 @@ public class GlobalRegistryServer implements Daemon
 	
 	// 5 minute delay, then every 12 hours
 	//@Scheduled(initialDelay=5 * 1000, fixedRate=30 * 1000)
-	@Scheduled(initialDelay=5 * 60 * 1000, fixedRate=12 * 60 * 60 * 1000)
+	@Scheduled(initialDelay=2 * 60 * 1000, fixedRate=1 * 60 * 60 * 1000)
 	protected void reconnect()
 	{
+		LOGGER.info("running reconnect functionality...");
+		
 		try
 		{
-			LOGGER.info("running reconnect functionality...");
 			DHTManager.getInstance().connectToConnectNode();
 		}
 		catch (Exception e)
