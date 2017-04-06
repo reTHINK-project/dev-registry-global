@@ -3,6 +3,12 @@ Global Registry
 
 ## Changelog
 
+### 0.3.4
+
+- implemented reconnect functionality
+- fixed some bugs
+- updated dependencies
+
 ### 0.3.3
 
 - updated SpringBoot framework to v1.5.2
