@@ -1,5 +1,5 @@
 # dev-registry-global
-Global Registry
+# Global Registry
 
 ## Changelog
 
@@ -84,7 +84,9 @@ Global Registry
 
 - 130.149.22.220:5002 (TUB)
 - 130.149.22.227:5002 (TUB)
-- 161.106.2.20:5002 (orange)
+- 161.106.2.20:5002 (Orange)
+
+see also [here](https://github.com/reTHINK-project/dev-registry-global/issues/27)
 
 ## Interfaces
 
