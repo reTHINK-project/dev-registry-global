@@ -301,7 +301,7 @@ public class Dataset
 			if(!matcher.matches())
 				throw new DatasetIntegrityException("invalid 'UserID' value for " + userID);
 		}
-
+        /*
 		if(getLegacyIDs().length() == 0)
 			throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");
 		for(int n = 0; n < getLegacyIDs().length(); n++)
@@ -317,7 +317,7 @@ public class Dataset
 					(!Base64.isArrayByteBase64(id.getBytes())))
 				throw new DatasetIntegrityException("invalid 'LegacyID' character set...");
 		}
-		
+		*/
 		return true;
 	}
 	

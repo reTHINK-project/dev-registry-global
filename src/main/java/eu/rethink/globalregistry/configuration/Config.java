@@ -21,7 +21,7 @@ public class Config
 	private static final String	productName					= "reTHINK Global Registry";
 	private static final String	productNameShort			= "gReg";
 	
-	private static final int	portDHT						= 5001;
+	private static final int	portDHT						= 6001;
 	private static final int	versionDatasetSchema		= 2;
 	private static final int	versionRESTAPI				= 1;
 	private static final int	versionDHTAPI				= 1;
@@ -30,7 +30,7 @@ public class Config
 	private static final String	networkInterfaceDefault		= "eth0";
 	private static final String	logPathDefault				= "logs";
 	private static final String	connectNodeDefault			= "130.149.22.220";
-	private static final int	portRESTDefault				= 5002;
+	private static final int	portRESTDefault				= 6002;
 	
 	//private int					reconnectInterval;
 	private String				networkInterface;
