@@ -95,22 +95,29 @@ public class DHTManager
 	 * @throws IOException
 	 * @throws GUIDNotFoundException 
 	 */
-	public String get(String key) throws ClassNotFoundException, IOException, GUIDNotFoundException
+	public String get(String key) throws GUIDNotFoundException
 	{
-		FutureGet futureGet = peer.get(Number160.createHash(key)).start();
-		futureGet.awaitUninterruptibly();
-		
-		// TODO: use non-blocking?
-		if(futureGet.isSuccess() && futureGet.data() != null)
+		try
 		{
-			return futureGet.data().object().toString();
+			FutureGet futureGet = peer.get(Number160.createHash(key)).start();
+			futureGet.awaitUninterruptibly();
+			
+			// TODO: use non-blocking?
+			if(futureGet.isSuccess() && futureGet.data() != null)
+			{
+				return futureGet.data().object().toString();
+			}
+			else
+			{
+				throw new GUIDNotFoundException("GUID not found");
+			}
+			
+			//return null; // TODO: decide on sentinel value
 		}
-		else
+		catch(ClassNotFoundException | IOException e)
 		{
-			throw new GUIDNotFoundException("");
+			throw new GUIDNotFoundException("GUID not found");
 		}
-		
-		//return null; // TODO: decide on sentinel value
 	}
 	
 	/**

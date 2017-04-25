@@ -236,7 +236,7 @@ public class RestService
 				
 				return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			catch (IOException | ClassNotFoundException e)
+			/*catch (IOException | ClassNotFoundException e)
 			{
 				// somewhere, a more severe exception was thrown
 				LOGGER.error("Internal Server Error: " + jwt + " e: "+ e.getMessage());
@@ -249,7 +249,7 @@ public class RestService
 				response.put("Value", "");
 				
 				return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+			}*/
 		}
 	}
 	
@@ -531,7 +531,7 @@ public class RestService
 			
 			return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		catch (IOException | ClassNotFoundException e)
+		/*catch (IOException | ClassNotFoundException e)
 		{
 			// somewhere, a more severe exception was thrown
 			LOGGER.error("Internal Server Error: " + jwt + " e: "+ e.getMessage());
@@ -544,7 +544,7 @@ public class RestService
 			response.put("Value", "");
 			
 			return new ResponseEntity<String>(response.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		}*/
 	}
 	
 	/**
