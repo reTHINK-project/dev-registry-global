@@ -10,8 +10,6 @@ For the evaluation of the Global Registry, three separate nodes were set up and 
 Each node consisted of a virtual server managed by VMware with 1 CPU, 1 GB of RAM, and 10 GB of disk space.
 The used operating system was Debian Jessie with a 3.16.0 kernel, while the Global Registry daemon was dockerized using Docker 17.03.1-ce.
 
-## Conformance metrics ##
-
 ## Performance metrics ##
 
 The conducted tests evaluate the performance of the Global Registry network unter high load. For this, JMeter was used to simulate multiple clients (100 threads) to access the service simultaneously.
