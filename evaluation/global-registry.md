@@ -14,6 +14,10 @@ The used operating system was Debian Jessie with a 3.16.0 kernel, while the Glob
 
 ## Performance metrics ##
 
-The conducted tests evaluate the performance of the Global Registry network unter high load.
+The conducted tests evaluate the performance of the Global Registry network unter high load. For this, JMeter was used to simulate multiple clients (100 threads) to access the service simultaneously.
+To keep the computational overhead of creating and signing datasets at a minimum, 4000 individual datasets were created in an offline-phase and saved to a database table. In the online phase, all datasets were read from the database and sent to the Global Registry and accessed again afterwards. Here, depending on the task, up to 340 (retrieving datasets via GET) and 120 (writing datasets via PUT) server hits per second were performed.
+
+When resolving a GUID, the service performed well with an average response time of 533ms with a median of 351ms. Anyhow, response times could be much higher, where a maximum value of more than 5492 ms was measured. The fastest response took only 23ms to complete.
+For writing datasets, an average response time of 1777ms was measured with a median value of 1174ms. The increased duration of PUT requests can be explained by the overhead required to write data to the DHT. Worst observed time for a PUT request was 13873ms, where the best was 25ms.
 
 ## Conclusions and recommendations ##
