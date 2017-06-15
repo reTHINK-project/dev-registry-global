@@ -19,3 +19,7 @@ When resolving a GUID, the service performed well with an average response time 
 For writing datasets, an average response time of 1777ms was measured with a median value of 1174ms. The increased duration of PUT requests can be explained by the overhead required to write data to the DHT. Worst observed time for a PUT request was 13873ms, where the best was 25ms.
 
 ## Conclusions and recommendations ##
+
+While the Global Registry is a central component of the ReThink architecture, write requests are assumed to occur rarely compared to resolving existing identifiers. With Kademlia as a basis for the underlying DHT architecture, GET requests are ansered quickly with a median value of 351ms.
+Writing performance was rather slow with a median value of 1174ms, but is thought to have no serious impact, as frequent updates to one's user accounts will only occur in the Domain Registy services, while the Global Registry will only be updated seldomly.
+To further increase performance and to stabalize the service, the service should be run on performant hardware. As the Global Registry was tested on virtual machines, limitations of processing power and RAM showed.
