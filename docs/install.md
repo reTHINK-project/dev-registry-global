@@ -2,7 +2,9 @@
 
 The Global Registry (GReg) is a decentralized directory service, linking globally unique user identifiers (GUIDs) to a list of user accounts owned by a user. By resolving a GUID, services can retrieve information about the existence and location of all registered user accounts for a specific user and connect to the respective account's Domain Registry. The Global Registry is built in Java using Spring Boot and relies on decentralized control by utilizing DHT technology.
 
-On a Debian-based system, execute the following commands to build GReg
+To compile and run the GReg, the project needs to be built using Maven. The resulting jar file is then used to build a docker image that can be run.
+
+To run GReg, docker needs to be installed. To run the compiled jar without docker, Java 8 needs to be installed. On a Debian-based system, execute the following commands to build the GReg 
 
 - Install maven and git:
 ```
