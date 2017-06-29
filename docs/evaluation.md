@@ -6,7 +6,7 @@ The Global Registry is built in Java using Spring Boot and relys on decentralize
 
 ## Methodology and setup ##
 
-For the evaluation of the Global Registry, three separate nodes were set up and connected to each other.
+For the evaluation of the Global Registry, three separate nodes were set up and connected to each other as described in the [installation manual](https://github.com/reTHINK-project/dev-registry-global/blob/master/docs/install.md).
 Each node consisted of a virtual server managed by VMware with 1 CPU, 1 GB of RAM, and 10 GB of disk space.
 The used operating system was Debian Jessie with a 3.16.0 kernel, while the Global Registry daemon was dockerized using Docker 17.03.1-ce.
 
