@@ -1,8 +1,8 @@
 ### Description of Component
 
 The Global Registry is a decentralized directory service, linking globally unique user identifiers (GUIDs) to a list of user accounts owned by a user.
-By resolving a GUID, services can retrieve information about the existence and location of all registeres user accounts for a specific user and connect to the respective account's Domain Registry.
-The Global Registry is built in Java using Spring Boot and relys on decentralized control by utinizing DHT technology.
+By resolving a GUID, services can retrieve information about the existence and location of all registered user accounts for a specific user and connect to the respective account's Domain Registry.
+The Global Registry is built in Java using Spring Boot and relies on decentralized control by utiizing DHT technology.
 
 ### Methodology and setup
 
@@ -12,7 +12,7 @@ The used operating system was Debian Jessie with a 3.16.0 kernel, while the Glob
 
 ### Performance metrics
 
-The conducted tests evaluate the performance of the Global Registry network unter high load. For this, JMeter was used to simulate multiple clients (100 threads) to access the service simultaneously.
+The conducted tests evaluate the performance of the Global Registry network under high load. For this, JMeter was used to simulate multiple clients (100 threads) to access the service simultaneously.
 To keep the computational overhead of creating and signing datasets at a minimum, 4000 individual datasets were created in an offline-phase and saved to a database table. In the online phase, all datasets were read from the database and sent to the Global Registry and accessed again afterwards. Here, depending on the task, up to 340 (retrieving datasets via GET) and 120 (writing datasets via PUT) server hits per second were performed.
 
 ![Elapsed times of GET and PUT requests](requesttimes.png)
@@ -23,6 +23,6 @@ For writing datasets, an average response time of 1777ms was measured with a med
 
 ### Conclusions and recommendations
 
-While the Global Registry is a central component of the ReThink architecture, write requests are assumed to occur rarely compared to resolving existing identifiers. With Kademlia as a basis for the underlying DHT architecture, GET requests are ansered quickly with a median value of 351ms.
-Writing performance was rather slow with a median value of 1174ms, but is thought to have no serious impact, as frequent updates to one's user accounts will only occur in the Domain Registy services, while the Global Registry will only be updated seldomly.
-To further increase performance and to stabalize the service, the service should be run on performant hardware. As the Global Registry was tested on virtual machines, limitations of processing power and RAM showed.
+While the Global Registry is a central component of the ReThink architecture, write requests are assumed to occur rarely compared to resolving existing identifiers. With Kademlia as a basis for the underlying DHT architecture, GET requests are answered quickly with a median value of 351ms.
+Writing performance was rather slow with a median value of 1174ms, but is thought to have no serious impact, as frequent updates to one's user accounts will only occur in the Domain Registry services, while the Global Registry will only be updated seldoml.
+To further increase performance and to stabalize the service, the service should be run on performant hardware. The Global Registry was tested on virtual machines with limitations of processing power and RAM.
