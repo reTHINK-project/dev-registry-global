@@ -67,7 +67,7 @@ public class Dataset
 		try
 		{
 			dataset.validateSchema();
-			dataset.checkIntegrity();
+			//dataset.checkIntegrity();
 		}
 		catch (DatasetIntegrityException e)
 		{
@@ -76,6 +76,11 @@ public class Dataset
 		}
 		
 		return dataset;
+	}
+	
+	public String toString()
+	{
+		return this.exportJSONObject().toString();
 	}
 	
 	public JSONObject exportJSONObject()
@@ -213,28 +218,40 @@ public class Dataset
 	}
 	
 	//validate schema is for checking the given datset against its schema format and structure.
-	public boolean validateSchema() throws DatasetIntegrityException {
+	public boolean validateSchema() throws DatasetIntegrityException
+	{
 		int version = this.schemaVersion;
-		switch (version) {
+		
+		switch (version)
+		{
 			case 1:
-				try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("schema_v1.json")) {
+				try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("schema_v1.json"))
+				{
 					JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
 					Schema schema = SchemaLoader.load(rawSchema);
 					schema.validate(exportJSONObject());
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					e.printStackTrace();
-				} catch (ValidationException e) {
+				}
+				catch (ValidationException e)
+				{
 					throw new DatasetIntegrityException("Dataset does not validate against JSON Schema");
 				}
 				break;
 			case 2:
-				try (InputStream inputStream = getClass().getResourceAsStream("schema_v2.json")) {
+				try (InputStream inputStream = getClass().getResourceAsStream("schema_v2.json"))
+				{
 					JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
 					Schema schema = SchemaLoader.load(rawSchema);
 					schema.validate(exportJSONObject());
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					e.printStackTrace();
-				} catch (ValidationException e) {
+				} catch (ValidationException e)
+				{
 					throw new DatasetIntegrityException("Dataset does not validate against JSON Schema");
 				}
 				break;
@@ -248,52 +265,52 @@ public class Dataset
 	public boolean checkIntegrity() throws DatasetIntegrityException
 	{
 		
-		if (getGUID().isEmpty())
+		if (this.getGUID().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'guid' missing");
-		if (!getGUID().equals(GUID.createGUID(this.getPublicKey(), this.getSalt())))
+		if (!this.getGUID().equals(GUID.createGUID(this.getPublicKey(), this.getSalt())))
 			throw new DatasetIntegrityException("illegal parameter value...");
 		
-		if (getLastUpdate().isEmpty())
+		if (this.getLastUpdate().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'lastUpdate' missing");
-		if (!XSDDateTime.validateXSDDateTime(getLastUpdate()))
+		if (!XSDDateTime.validateXSDDateTime(this.getLastUpdate()))
 			throw new DatasetIntegrityException("invalid 'DateTime' format...");
 		
-		if(getTimeout().isEmpty())
+		if(this.getTimeout().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'timeout' missing");
-		if (!XSDDateTime.validateXSDDateTime(getTimeout()))
+		if (!XSDDateTime.validateXSDDateTime(this.getTimeout()))
 			throw new DatasetIntegrityException("invalid 'DateTime' format...");
 		
-		if (getPublicKey().isEmpty())
+		if (this.getPublicKey().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'publicKey' missing");
-		String stringtobechecked = getPublicKey().substring(26, getPublicKey().length()-24);
+		String stringtobechecked = this.getPublicKey().substring(26, this.getPublicKey().length()-24);
 		if (!Base64.isArrayByteBase64(stringtobechecked.getBytes()))
 			throw new DatasetIntegrityException("invalid 'PublicKey' character set...");
 		
-		if (getSalt().isEmpty())
+		if (this.getSalt().isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'salt' missing");
-		if (!Base64.isArrayByteBase64(getSalt().getBytes()))
+		if (!Base64.isArrayByteBase64(this.getSalt().getBytes()))
 			throw new DatasetIntegrityException("invalid 'Salt' character set...");
 		
-		String isactive = Integer.toString(getActive());
+		String isactive = Integer.toString(this.getActive());
 		if(isactive.isEmpty())
-			throw new DatasetIntegrityException("mandatory parameter 'Active' missing");
-		if(getActive() != 0 && getActive() != 1)
-			throw new DatasetIntegrityException("invalid 'Active' value...");
+			throw new DatasetIntegrityException("mandatory parameter 'active' missing");
+		if(this.getActive() != 0 && this.getActive() != 1)
+			throw new DatasetIntegrityException("invalid 'active' value...");
 		
-		String isrevoked = Integer.toString(getRevoked());
+		String isrevoked = Integer.toString(this.getRevoked());
 		if(isrevoked.isEmpty())
 			throw new DatasetIntegrityException("mandatory parameter 'revoked' missing");
-		if(getRevoked() != 0 && getRevoked() != 1)
-			throw new DatasetIntegrityException("invalid 'Revoked' value...");
+		if(this.getRevoked() != 0 && this.getRevoked() != 1)
+			throw new DatasetIntegrityException("invalid 'revoked' value...");
 		
 		/*if(getUserIDs().length() == 0)
 			throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");*/
 		
 		String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 		Pattern pattern = Pattern.compile(regex);
-		for(int n = 0; n < getUserIDs().length(); n++)
+		for(int n = 0; n < this.getUserIDs().length(); n++)
 		{
-			JSONObject object = getUserIDs().getJSONObject(n);
+			JSONObject object = this.getUserIDs().getJSONObject(n);
 			String uid = object.getString("uID");
 			String domain = object.getString("domain");
 			String userID = uid + "@" + domain;
@@ -302,11 +319,11 @@ public class Dataset
 				throw new DatasetIntegrityException("invalid 'UserID' value for " + userID);
 		}
 
-		if(getLegacyIDs().length() == 0)
+		if(this.getLegacyIDs().length() == 0)
 			throw new DatasetIntegrityException("mandatory parameter 'userIDs' missing");
-		for(int n = 0; n < getLegacyIDs().length(); n++)
+		for(int n = 0; n < this.getLegacyIDs().length(); n++)
 		{
-			JSONObject object = getLegacyIDs().getJSONObject(n);
+			JSONObject object = this.getLegacyIDs().getJSONObject(n);
 			String type = object.getString("type");
 			String category = object.getString("category");
 			String description = object.getString("description");

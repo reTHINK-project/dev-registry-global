@@ -124,6 +124,8 @@ public class DatasetTool
 					dataset = Dataset.createFromJSONObject(json.getJSONObject("dataset"));
 					privateKey = json.getString("privateKey");
 					
+					//System.out.println(">>>>" + json.getJSONObject("dataset").toString());
+					
 					verifyDataset();
 					
 					System.out.print("dataset successfully created. GUID: " + dataset.getGUID() + "\n");
@@ -846,7 +848,6 @@ public class DatasetTool
 	private static void verifyDataset()
 	{
 		System.out.print("verifying values of dataset ... ");
-
 
 		try
 		{
